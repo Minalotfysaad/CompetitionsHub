@@ -1,6 +1,6 @@
 ﻿using DomainLayer.Models;
 
-namespace CompetitionsTest.Models
+namespace CompetitionsTest.Models.QuestionModel
 {
     public class LinearScaleConfiguration : BaseEntity<int>
     {
@@ -10,7 +10,7 @@ namespace CompetitionsTest.Models
         public string? MaxLabel { get; set; }
 
         //Navigational Properties
-        public Question Question { get; set; }
         public int QuestionId { get; set; }
+        public Question Question { get; set; } = default!;
     }
 }

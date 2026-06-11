@@ -1,11 +1,10 @@
 ﻿using CompetitionsTest.Enums;
 using DomainLayer.Models;
 
-namespace CompetitionsTest.Models.MultipleChoiceGridQuestion
+namespace CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion
 {
     public class MultipleChoiceGridConfiguration : BaseEntity<int>
     {
-        public GridSelectionMode SelectionMode { get; set; }
         public ICollection<GridRow> Rows { get; set; } = [];
         public ICollection<GridColumn> Columns { get; set; } = [];
 

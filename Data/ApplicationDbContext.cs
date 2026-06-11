@@ -1,6 +1,8 @@
 ﻿using CompetitionsTest.Data.Configurations;
 using CompetitionsTest.Models;
-using CompetitionsTest.Models.MultipleChoiceGridQuestion;
+using CompetitionsTest.Models.QuestionModel;
+using CompetitionsTest.Models.QuestionModel.QuestionCongifuration;
+using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 
