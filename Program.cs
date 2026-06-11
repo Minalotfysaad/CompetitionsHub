@@ -6,6 +6,8 @@ using DomainLayer.Contracts;
 using GarasForms.Core;
 using GarasForms.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using ServiceAbstraction;
+using Services;
 
 namespace CompetitionsTest
 {
@@ -23,7 +25,9 @@ namespace CompetitionsTest
                 options.UseSqlServer(connectionString));
             builder.Services.AddAutoMapper(typeof(Program));
 
+            builder.Services.AddAutoMapper(typeof(AssemblyReference).Assembly);
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
             builder.Services.AddScoped<IQuestionService, QuestionService>();
             builder.Services.AddScoped<ICompetitionDayService, CompetitionDayService>();
 

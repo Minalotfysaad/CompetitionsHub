@@ -18,5 +18,9 @@ namespace Services
         private readonly Lazy<IQuestionService> _lazyQuestionService = new Lazy<IQuestionService>(() => new QuestionService(_unitOfWork, _mapper));
         public IQuestionService QuestionService => _lazyQuestionService.Value;
 
+        // CompetitionService Lazy initializing
+        private readonly Lazy<ICompetitionService> _lazyCompetitionService = new Lazy<ICompetitionService>(() => new CompetitionService(_unitOfWork, _mapper));
+        public ICompetitionService CompetitionService => _lazyCompetitionService.Value;
+
     }
 }

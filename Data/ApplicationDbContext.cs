@@ -1,5 +1,4 @@
-﻿using CompetitionsTest.Data.Configurations;
-using CompetitionsTest.Models;
+﻿using CompetitionsTest.Models;
 using CompetitionsTest.Models.QuestionModel;
 using CompetitionsTest.Models.QuestionModel.QuestionCongifuration;
 using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion;
@@ -16,7 +15,7 @@ namespace CompetitionsTest.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Configurations.AssemblyReference).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssemblyReference).Assembly);
         }
 
         //Dbsets Properties

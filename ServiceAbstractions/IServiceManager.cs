@@ -9,6 +9,7 @@ namespace ServiceAbstraction
 {
     public interface IServiceManager
     {
+        public ICompetitionService CompetitionService { get; }
         public ICompetitionDayService CompetitionDayService { get; }
         public IQuestionService QuestionService { get; }
     }

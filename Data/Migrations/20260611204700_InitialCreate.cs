@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,17 +12,42 @@ namespace CompetitionsTest.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Competition",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Competition", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CompetitionDays",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DayNum = table.Column<int>(type: "int", nullable: false)
+                    DayNum = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompetitionId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CompetitionDays", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompetitionDays_Competition_CompetitionId",
+                        column: x => x.CompetitionId,
+                        principalTable: "Competition",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -30,11 +56,12 @@ namespace CompetitionsTest.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
                     IsRequired = table.Column<bool>(type: "bit", nullable: false),
-                    Mark = table.Column<int>(type: "int", nullable: false),
+                    QuestionMark = table.Column<int>(type: "int", nullable: false),
                     CompetitionDayId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -77,7 +104,6 @@ namespace CompetitionsTest.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SelectionMode = table.Column<int>(type: "int", nullable: false),
                     QuestionId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -92,12 +118,33 @@ namespace CompetitionsTest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "QuestionAnswer",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AnswerData = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QuestionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuestionAnswer", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_QuestionAnswer_Questions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "Questions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "QuestionOptions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsCorrect = table.Column<bool>(type: "bit", nullable: false),
                     QuestionId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -152,6 +199,11 @@ namespace CompetitionsTest.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompetitionDays_CompetitionId",
+                table: "CompetitionDays",
+                column: "CompetitionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GridColumns_GridConfigurationId",
                 table: "GridColumns",
                 column: "GridConfigurationId");
@@ -170,6 +222,12 @@ namespace CompetitionsTest.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_MultipleChoiceGridConfigurations_QuestionId",
                 table: "MultipleChoiceGridConfigurations",
+                column: "QuestionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionAnswer_QuestionId",
+                table: "QuestionAnswer",
                 column: "QuestionId",
                 unique: true);
 
@@ -197,6 +255,9 @@ namespace CompetitionsTest.Data.Migrations
                 name: "LinearScaleConfigurations");
 
             migrationBuilder.DropTable(
+                name: "QuestionAnswer");
+
+            migrationBuilder.DropTable(
                 name: "QuestionOptions");
 
             migrationBuilder.DropTable(
@@ -207,6 +268,9 @@ namespace CompetitionsTest.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "CompetitionDays");
+
+            migrationBuilder.DropTable(
+                name: "Competition");
         }
     }
 }

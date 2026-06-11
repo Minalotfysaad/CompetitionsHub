@@ -18,10 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <Folder Include="Data\Configurations\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="Data\DataSeed\" />
-    <Folder Include="DTOs\CompetitionDay\" />
     <Folder Include="Exceptions\" />
   </ItemGroup>
 

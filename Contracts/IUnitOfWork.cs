@@ -14,6 +14,6 @@ namespace GarasForms.Core
 
         IBaseRepository<T, TD> GetRepository<T, TD>() where T : BaseEntity<TD>;
         IQueryable<T> GetAsNoTracking<T>() where T : class;
-         int Complete();
+        Task<int> SaveChangesAsync();
     }
 }

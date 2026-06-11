@@ -1,4 +1,4 @@
-﻿namespace CompetitionsTest.Data.Configurations
+﻿namespace CompetitionsTest
 {
     public class AssemblyReference
     {
