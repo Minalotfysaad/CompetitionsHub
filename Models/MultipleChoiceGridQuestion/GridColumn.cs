@@ -1,0 +1,11 @@
+﻿using DomainLayer.Models;
+
+namespace CompetitionsTest.Models.MultipleChoiceGridQuestion
+{
+    public class GridColumn : BaseEntity<int>
+    {
+        public string Text { get; set; }
+        public int GridConfigurationId { get; set; }
+        public MultipleChoiceGridConfiguration GridConfiguration { get; set; }
+    }
+}
