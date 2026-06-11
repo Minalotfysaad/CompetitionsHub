@@ -23,7 +23,6 @@ namespace CompetitionsTest
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
-            builder.Services.AddAutoMapper(typeof(Program));
 
             builder.Services.AddAutoMapper(typeof(AssemblyReference).Assembly);
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

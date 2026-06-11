@@ -3,7 +3,6 @@ using CompetitionsTest.DTOs.Competition;
 using CompetitionsTest.Models;
 using CompetitionsTest.ServiceAbstractions;
 using GarasForms.Core;
-using GarasForms.Core.Interfaces;
 
 namespace CompetitionsTest.Services
 {
@@ -20,7 +19,7 @@ namespace CompetitionsTest.Services
             return competitionDto;
         }
 
-        public async Task<IEnumerable<CompetitionDto>> GetAllAsync()
+        public async Task<IEnumerable<CompetitionDto>> GetAllAsync() // with no include for lightweight
         {
             var repo = _unitOfWork.GetRepository<Competition, int>();
             var competitions = await repo.GetAllAsync();

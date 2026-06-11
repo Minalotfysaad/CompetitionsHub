@@ -1,7 +1,4 @@
 ﻿using CompetitionsTest.DTOs.Competition;
-using CompetitionsTest.ServiceAbstractions;
-using GarasForms.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 
@@ -12,14 +9,14 @@ namespace CompetitionsTest.Controllers
     public class CompetitionController(IServiceManager _serviceManager) : ControllerBase
     {
 
-        [HttpPost]
+        [HttpPost()]
         public async Task<IActionResult> Create([FromBody] CreateCompetitionDto dto)
         {
             var result = await _serviceManager.CompetitionService.CreateAsync(dto);
             return Ok(result);
         }
 
-        [HttpGet]
+        [HttpGet()]
         public async Task<IActionResult> GetAll()
         {
             var result = await _serviceManager.CompetitionService.GetAllAsync();
@@ -44,7 +41,7 @@ namespace CompetitionsTest.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _serviceManager.CompetitionService.DeleteAsync(id);
-            return NoContent();
+            return Ok();
         }
     }
 }
