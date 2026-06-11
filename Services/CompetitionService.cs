@@ -19,10 +19,12 @@ namespace CompetitionsTest.Services
             return competitionDto;
         }
 
-        public async Task<IEnumerable<CompetitionDto>> GetAllAsync() // with no include for lightweight
+        public async Task<IEnumerable<CompetitionDto>> GetAllAsync() 
         {
             var repo = _unitOfWork.GetRepository<Competition, int>();
-            var competitions = await repo.GetAllAsync();
+            var competitions = await repo.FindAllAsync(
+                c => true,
+                includes: null!); // with no include for lightweight
             var competitionDto = _mapper.Map<IEnumerable<CompetitionDto>>(competitions);
             return competitionDto;
         }
