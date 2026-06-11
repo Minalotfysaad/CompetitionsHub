@@ -3,6 +3,8 @@ using CompetitionsTest.Data;
 using CompetitionsTest.ServiceAbstractions;
 using CompetitionsTest.Services;
 using DomainLayer.Contracts;
+using GarasForms.Core;
+using GarasForms.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CompetitionsTest
@@ -21,6 +23,7 @@ namespace CompetitionsTest
                 options.UseSqlServer(connectionString));
             builder.Services.AddAutoMapper(typeof(Program));
 
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IQuestionService, QuestionService>();
             builder.Services.AddScoped<ICompetitionDayService, CompetitionDayService>();
 
