@@ -2,6 +2,7 @@
 using CompetitionsTest.Models.QuestionModel.QuestionCongifuration;
 using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion;
 using DomainLayer.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CompetitionsTest.Models.QuestionModel
 {
@@ -14,15 +15,19 @@ namespace CompetitionsTest.Models.QuestionModel
         public bool IsRequired { get; set; }
         public int QuestionMark { get; set; }
 
-        //Question Configurations
+        // Question Configurations
         public LinearScaleConfiguration? LinearScaleConfiguration { get; set; }
         public MultipleChoiceGridConfiguration? MultipleChoiceGridConfiguration { get; set; }
-        public ICollection<QuestionOption>? Options { get; set; } // MultipleChoice 
-        public QuestionAnswer? CorrectAnswer { get; set; } // non-option based questions
+        public ICollection<QuestionOption>? Options { get; set; }
+        public QuestionCorrectAnswer? CorrectAnswer { get; set; }
 
-        //Navigation
+        // Navigation
         public int CompetitionDayId { get; set; }
-        public CompetitionDay CompetitionDay { get; set; }
+        public CompetitionDay CompetitionDay { get; set; } = default!;
 
+        // Not Mapped
+        [NotMapped]
+        public bool IsAutomaticallyGradable =>
+            Type != QuestionType.Paragraph;
     }
 }

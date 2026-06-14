@@ -41,14 +41,14 @@ namespace CompetitionsTest.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCompetitionDto dto)
         {
             var result = await _serviceManager.CompetitionService.UpdateAsync(id, dto);
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _serviceManager.CompetitionService.DeleteAsync(id);

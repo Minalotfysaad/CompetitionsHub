@@ -2,7 +2,7 @@
 
 namespace CompetitionsTest.Models.QuestionModel.QuestionCongifuration
 {
-    public class QuestionAnswer : BaseEntity<int>
+    public class QuestionCorrectAnswer : BaseEntity<int>
     {
         public string AnswerData { get; set; } = default!;
 
