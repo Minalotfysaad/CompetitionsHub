@@ -7,7 +7,7 @@ namespace CompetitionsTest.ServiceAbstractions
         Task<QuestionDto> CreateAsync(CreateQuestionDto dto);
         Task<QuestionDto> GetByIdAsync(int id);
         Task<IEnumerable<QuestionDto>> GetByCompetitionDayAsync(int competitionDayId);
-        Task<QuestionDto> UpdateAsync(int id, UpdateQuestionDto dto);
+        Task<QuestionDto> UpdateAsync(int id, CreateQuestionDto dto);
         Task DeleteAsync(int id);
     }
 }
