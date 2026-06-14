@@ -1,4 +1,6 @@
-﻿using CompetitionsTest.DTOs.Competition;
+﻿using CompetitionsTest.DTOs;
+using CompetitionsTest.DTOs.Competition;
+using CompetitionsTest.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 
@@ -16,12 +18,21 @@ namespace CompetitionsTest.Controllers
             return Ok(result);
         }
 
-        [HttpGet()]
-        public async Task<IActionResult> GetAll()
+        //[HttpGet()]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    var result = await _serviceManager.CompetitionService.GetAllAsync();
+        //    return Ok(result);
+        //}
+
+
+        [HttpGet]
+        public async Task<ActionResult<PaginationResponse<CompetitionListDto>>> GetAllAsync([FromQuery] CompetitionQueryParams queryParams)
         {
-            var result = await _serviceManager.CompetitionService.GetAllAsync();
+            var result = await _serviceManager.CompetitionService.GetAllAsync(queryParams);
             return Ok(result);
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

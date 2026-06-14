@@ -10,7 +10,8 @@ namespace CompetitionsTest.Mapping_Profiles
         {
             CreateMap<CreateCompetitionDto, Competition>();
             CreateMap<Competition, CompetitionDto>();
-            CreateMap<UpdateCompetitionDto, Competition>();
+            CreateMap<Competition, CompetitionListDto>();
+            CreateMap<Competition, CompetitionDetailsDto>();
         }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using CompetitionsTest.DTOs;
 using CompetitionsTest.DTOs.Competition;
+using CompetitionsTest.Helpers;
 using CompetitionsTest.Models;
 using CompetitionsTest.ServiceAbstractions;
 using GarasForms.Core;
+using GarasForms.Core.Helpers;
 
 namespace CompetitionsTest.Services
 {
@@ -19,28 +22,50 @@ namespace CompetitionsTest.Services
             return competitionDto;
         }
 
-        public async Task<IEnumerable<CompetitionDto>> GetAllAsync() 
+        //public async Task<IEnumerable<CompetitionListDto>> GetAllAsync()
+        //{
+        //    var repo = _unitOfWork.GetRepository<Competition, int>();
+        //    var competitions = await repo.GetAllAsync();
+
+        //    return _mapper.Map<IEnumerable<CompetitionListDto>>(competitions);
+        //}
+
+        public async Task<PaginationResponse<CompetitionListDto>> GetAllAsync(CompetitionQueryParams queryParams)
         {
             var repo = _unitOfWork.GetRepository<Competition, int>();
-            var competitions = await repo.FindAllAsync(
+
+            var competitions = await repo.FindAllPagingAsync(
                 c => true,
-                includes: null!); // with no include for lightweight
-            var competitionDto = _mapper.Map<IEnumerable<CompetitionDto>>(competitions);
-            return competitionDto;
+                queryParams.PageNumber,
+                queryParams.PageSize,
+                orderBy: c => c.Id);
+
+            var dtoItems = _mapper.Map<IEnumerable<CompetitionListDto>>(competitions);
+            return new PaginationResponse<CompetitionListDto>
+            {
+                Items = dtoItems,
+                CurrentPage = competitions.CurrentPage,
+                TotalPages = competitions.TotalPages,
+                PageSize = competitions.PageSize,
+                TotalCount = competitions.TotalCount,
+                StartFrom = competitions.StartFrom,
+                EndTo = competitions.EndTo
+            };
         }
 
-        public async Task<CompetitionDto> GetByIdAsync(int id)
+
+        public async Task<CompetitionDetailsDto> GetByIdAsync(int id)
         {
             var repo = _unitOfWork.GetRepository<Competition, int>();
+
             var competition = await repo.FindAsync(
                 c => c.Id == id,
                 includes: new[] { "Days" });
 
-            if (competition == null)
+            if (competition is null)
                 throw new Exception($"Competition {id} not found");
 
-            var competitionDto = _mapper.Map<CompetitionDto>(competition);
-            return competitionDto;
+            return _mapper.Map<CompetitionDetailsDto>(competition);
         }
 
         public async Task<CompetitionDto> UpdateAsync(int id, UpdateCompetitionDto dto)
