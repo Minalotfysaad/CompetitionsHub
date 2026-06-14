@@ -25,12 +25,6 @@ namespace CompetitionsTest.Controllers
             return Ok(result);
         }
 
-        [HttpGet("competition-day/{competitionDayId}")]
-        public async Task<ActionResult<IEnumerable<QuestionDto>>>GetByCompetitionDay(int competitionDayId)
-        {
-            var result =await _serviceManager.QuestionService.GetByCompetitionDayAsync(competitionDayId);
-            return Ok(result);
-        }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<QuestionDto>> Update(int id,[FromBody] CreateQuestionDto dto)
