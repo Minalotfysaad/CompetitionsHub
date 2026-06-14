@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompetitionsTest.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260611204700_InitialCreate")]
+    [Migration("20260614221224_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -35,12 +35,6 @@ namespace CompetitionsTest.Data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -150,6 +144,32 @@ namespace CompetitionsTest.Data.Migrations
                     b.ToTable("Questions");
                 });
 
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridAnswerKey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ColumnKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GridConfigurationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RowKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GridConfigurationId");
+
+                    b.ToTable("GridAnswerKey");
+                });
+
             modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridColumn", b =>
                 {
                     b.Property<int>("Id")
@@ -213,7 +233,7 @@ namespace CompetitionsTest.Data.Migrations
                     b.ToTable("MultipleChoiceGridConfigurations");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswer", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswerKey", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -233,7 +253,7 @@ namespace CompetitionsTest.Data.Migrations
                     b.HasIndex("QuestionId")
                         .IsUnique();
 
-                    b.ToTable("QuestionAnswer");
+                    b.ToTable("QuestionAnswerKey");
                 });
 
             modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionOption", b =>
@@ -243,9 +263,6 @@ namespace CompetitionsTest.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsCorrect")
-                        .HasColumnType("bit");
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
@@ -294,6 +311,17 @@ namespace CompetitionsTest.Data.Migrations
                     b.Navigation("CompetitionDay");
                 });
 
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridAnswerKey", b =>
+                {
+                    b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", "GridConfiguration")
+                        .WithMany("AnswerKeys")
+                        .HasForeignKey("GridConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GridConfiguration");
+                });
+
             modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridColumn", b =>
                 {
                     b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", "GridConfiguration")
@@ -327,11 +355,11 @@ namespace CompetitionsTest.Data.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswer", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswerKey", b =>
                 {
                     b.HasOne("CompetitionsTest.Models.QuestionModel.Question", "Question")
                         .WithOne("CorrectAnswer")
-                        .HasForeignKey("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswer", "QuestionId")
+                        .HasForeignKey("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswerKey", "QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -372,6 +400,8 @@ namespace CompetitionsTest.Data.Migrations
 
             modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", b =>
                 {
+                    b.Navigation("AnswerKeys");
+
                     b.Navigation("Columns");
 
                     b.Navigation("Rows");

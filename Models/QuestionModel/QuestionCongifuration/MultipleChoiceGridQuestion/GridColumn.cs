@@ -4,7 +4,7 @@ namespace CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleCh
 {
     public class GridColumn : BaseEntity<int>
     {
-        public string Text { get; set; }
+        public string Text { get; set; } = default!;
 
         // Navigation
         public int GridConfigurationId { get; set; }

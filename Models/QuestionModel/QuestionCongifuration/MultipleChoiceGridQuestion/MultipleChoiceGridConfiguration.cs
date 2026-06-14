@@ -7,7 +7,7 @@ namespace CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleCh
     {
         public ICollection<GridRow> Rows { get; set; } = [];
         public ICollection<GridColumn> Columns { get; set; } = [];
-        public ICollection<GridCorrectAnswer> CorrectAnswers { get; set; } = [];
+        public ICollection<GridAnswerKey> AnswerKeys { get; set; } = [];
 
         //Navigational Properties
         public int QuestionId { get; set; }

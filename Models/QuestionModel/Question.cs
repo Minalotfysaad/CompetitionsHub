@@ -11,6 +11,7 @@ namespace CompetitionsTest.Models.QuestionModel
         public int DisplayOrder { get; set; }
         public string Title { get; set; } = default!;
         public string? Description { get; set; }
+
         public QuestionType Type { get; set; }
         public bool IsRequired { get; set; }
         public int QuestionMark { get; set; }
