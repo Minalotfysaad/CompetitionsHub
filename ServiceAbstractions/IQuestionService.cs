@@ -1,15 +1,13 @@
-﻿namespace CompetitionsTest.ServiceAbstractions
+﻿using CompetitionsTest.DTOs.Question;
+
+namespace CompetitionsTest.ServiceAbstractions
 {
     public interface IQuestionService
     {
-        //Task<IReadOnlyList<QuestionDto>> GetQuestionsByCompetitionDayAsync(int dayId);
-
-        //Task<QuestionDto?> GetByIdAsync(int id);
-
-        //Task<QuestionDto> CreateAsync(QuestionDto dto);
-
-        //Task<QuestionDto> UpdateAsync(int id, QuestionDto dto);
-
-        //Task DeleteAsync(int id);
+        Task<QuestionDto> CreateAsync(CreateQuestionDto dto);
+        Task<QuestionDto> GetByIdAsync(int id);
+        Task<IEnumerable<QuestionDto>> GetByCompetitionDayAsync(int competitionDayId);
+        Task<QuestionDto> UpdateAsync(int id, UpdateQuestionDto dto);
+        Task DeleteAsync(int id);
     }
 }
