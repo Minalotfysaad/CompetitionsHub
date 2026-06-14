@@ -19,7 +19,7 @@ namespace CompetitionsTest.Models.QuestionModel
         public LinearScaleConfiguration? LinearScaleConfiguration { get; set; }
         public MultipleChoiceGridConfiguration? MultipleChoiceGridConfiguration { get; set; }
         public ICollection<QuestionOption>? Options { get; set; }
-        public QuestionCorrectAnswer? CorrectAnswer { get; set; }
+        public QuestionAnswerKey? CorrectAnswer { get; set; }
 
         // Navigation
         public int CompetitionDayId { get; set; }
