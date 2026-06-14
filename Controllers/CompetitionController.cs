@@ -34,7 +34,7 @@ namespace CompetitionsTest.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _serviceManager.CompetitionService.GetByIdAsync(id);
