@@ -113,11 +113,12 @@ namespace CompetitionsTest.Services
         #region Helpers
 
         private static readonly string[] QuestionIncludes =
-[
-    "Options",
+            [
+            "Options",
             "CorrectAnswer",
-            "LinearScaleConfiguration"
-];
+            "LinearScaleConfiguration",
+            "MultipleChoiceGridConfiguration"
+            ];
         private static Question BuildQuestion(CreateQuestionDto dto)
         {
             return new Question

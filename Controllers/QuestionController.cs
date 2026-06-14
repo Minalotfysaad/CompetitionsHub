@@ -1,0 +1,49 @@
+﻿using CompetitionsTest.DTOs.Question;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using ServiceAbstraction;
+
+namespace CompetitionsTest.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class QuestionController(IServiceManager _serviceManager)
+        : ControllerBase
+    {
+        [HttpPost]
+        public async Task<ActionResult<QuestionDto>> Create([FromBody] CreateQuestionDto dto)
+        {
+            var result =await _serviceManager.QuestionService.CreateAsync(dto);
+            return Ok(result);
+        }
+
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<QuestionDto>> GetById(int id)
+        {
+            var result =await _serviceManager.QuestionService.GetByIdAsync(id);
+            return Ok(result);
+        }
+
+        [HttpGet("competition-day/{competitionDayId}")]
+        public async Task<ActionResult<IEnumerable<QuestionDto>>>GetByCompetitionDay(int competitionDayId)
+        {
+            var result =await _serviceManager.QuestionService.GetByCompetitionDayAsync(competitionDayId);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<QuestionDto>> Update(int id,[FromBody] CreateQuestionDto dto)
+        {
+            var result =await _serviceManager.QuestionService.UpdateAsync(id, dto);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _serviceManager.QuestionService.DeleteAsync(id);
+            return NoContent();
+        }
+    }
+}
