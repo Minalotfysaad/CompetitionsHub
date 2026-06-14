@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using CompetitionsTest.DTOs.Question;
+using CompetitionsTest.Enums;
 using CompetitionsTest.Models;
+using CompetitionsTest.Models.QuestionModel;
+using CompetitionsTest.Models.QuestionModel.QuestionCongifuration;
 using CompetitionsTest.ServiceAbstractions;
 using DomainLayer.Contracts;
 using GarasForms.Core;
@@ -9,29 +12,254 @@ namespace CompetitionsTest.Services
 {
     public class QuestionService(IUnitOfWork _unitOfWork, IMapper _mapper) : IQuestionService
     {
-        public Task<QuestionDto> CreateAsync(CreateQuestionDto dto)
+        public async Task<QuestionDto> CreateAsync(CreateQuestionDto dto)
         {
-            throw new NotImplementedException();
+            // Validate Competition Day Exists
+            var competitionDayRepo =
+                _unitOfWork.GetRepository<CompetitionDay, int>();
+
+            var competitionDay =
+                await competitionDayRepo.GetByIdAsync(dto.CompetitionDayId);
+
+            if (competitionDay is null)
+                throw new Exception("Competition day not found");
+
+            var question = BuildQuestion(dto);
+
+            ApplyQuestionTypeConfiguration(question, dto);
+
+            var questionRepo = _unitOfWork.GetRepository<Question, int>();
+
+            await questionRepo.AddAsync(question);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var questionDto = _mapper.Map<QuestionDto>(question);
+            return questionDto;
         }
 
-        public Task DeleteAsync(int id)
+        public async Task<QuestionDto> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var repo = _unitOfWork.GetRepository<Question, int>();
+
+            var question = await repo.FindAsync(
+                q => q.Id == id,
+                includes:
+                [
+                    "Options",
+                    "CorrectAnswer",
+                    "LinearScaleConfiguration"
+                ]);
+
+            if (question is null)
+                throw new Exception("Question not found");
+
+            return _mapper.Map<QuestionDto>(question);
         }
 
-        public Task<IEnumerable<QuestionDto>> GetByCompetitionDayAsync(int competitionDayId)
+        public async Task<IEnumerable<QuestionDto>> GetByCompetitionDayAsync(int competitionDayId)
         {
-            throw new NotImplementedException();
+            var competitionDayRepo =
+                _unitOfWork.GetRepository<CompetitionDay, int>();
+
+            var day = await competitionDayRepo.GetByIdAsync(competitionDayId);
+
+            if (day is null)
+                throw new Exception("Competition day not found");
+
+            var repo = _unitOfWork.GetRepository<Question, int>();
+
+            var questions = await repo.FindAllAsync(
+                q => q.CompetitionDayId == competitionDayId,
+                includes:
+                [
+                    "Options",
+                    "CorrectAnswer",
+                    "LinearScaleConfiguration"
+                ]);
+
+            return _mapper.Map<IEnumerable<QuestionDto>>(questions);
         }
 
-        public Task<QuestionDto> GetByIdAsync(int id)
+        public async Task<QuestionDto> UpdateAsync(int id, CreateQuestionDto dto)
         {
-            throw new NotImplementedException();
+            var repo = _unitOfWork.GetRepository<Question, int>();
+
+            var question = await repo.FindAsync(
+                q => q.Id == id,
+                includes:
+                [
+                    "Options",
+                    "CorrectAnswer",
+                    "LinearScaleConfiguration"
+                ]);
+
+            if (question is null)
+                throw new Exception("Question not found");
+
+            UpdateQuestion(question, dto);
+
+            ApplyQuestionTypeConfiguration(question, dto);
+
+            repo.Update(question);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<QuestionDto>(question);
         }
 
-        public Task<QuestionDto> UpdateAsync(int id, CreateQuestionDto dto)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var repo = _unitOfWork.GetRepository<Question, int>();
+
+            var question = await repo.GetByIdAsync(id);
+
+            if (question is null)
+                throw new Exception("Question not found");
+
+            repo.Delete(question);
+
+            await _unitOfWork.SaveChangesAsync();
         }
+
+
+
+
+
+        #region Functions
+        private static Question BuildQuestion(CreateQuestionDto dto)
+        {
+            return new Question
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                Type = dto.Type,
+                IsRequired = dto.IsRequired,
+                QuestionMark = dto.QuestionMark,
+                DisplayOrder = dto.DisplayOrder,
+                CompetitionDayId = dto.CompetitionDayId
+            };
+        }
+
+        private static void UpdateQuestion(Question question, CreateQuestionDto dto)
+        {
+            question.Title = dto.Title;
+            question.Description = dto.Description;
+            question.IsRequired = dto.IsRequired;
+            question.QuestionMark = dto.QuestionMark;
+            question.DisplayOrder = dto.DisplayOrder;
+
+            //Clear previous config
+            question.Options?.Clear();
+            question.CorrectAnswer = null;
+            question.LinearScaleConfiguration = null;
+        }
+
+        private static void ApplyQuestionTypeConfiguration(Question question, CreateQuestionDto dto)
+        {
+            switch (dto.Type)
+            {
+                case QuestionType.MultipleChoice:
+                    ConfigureMultipleChoice(question, dto);
+                    break;
+
+                case QuestionType.LinearScale:
+                    ConfigureLinearScale(question, dto);
+                    break;
+
+                case QuestionType.ShortAnswer:
+                    ConfigureShortAnswer(question, dto);
+                    break;
+
+                case QuestionType.Paragraph:
+                    ConfigureParagraph(question);
+                    break;
+
+                default:
+                    throw new Exception("Unsupported question type");
+            }
+        }
+
+
+        private static void ConfigureMultipleChoice(Question question, CreateQuestionDto dto)
+        {
+            if (dto.MultipleChoice is null)
+                throw new Exception("Multiple choice configuration is required");
+
+            if (dto.MultipleChoice.Options.Count < 2)
+                throw new Exception("At least two options are required");
+
+            if (dto.MultipleChoice.CorrectOptionIndex < 0 ||
+                dto.MultipleChoice.CorrectOptionIndex >= dto.MultipleChoice.Options.Count)
+                throw new Exception("Invalid correct option index");
+
+            question.Options = dto.MultipleChoice.Options
+                .Select(o => new QuestionOption
+                {
+                    Text = o
+                })
+                .ToList();
+
+            question.CorrectAnswer = new QuestionAnswerKey
+            {
+                AnswerData =
+                    dto.MultipleChoice.CorrectOptionIndex.ToString()
+            };
+        }
+
+        private static void ConfigureLinearScale(Question question, CreateQuestionDto dto)
+        {
+            if (dto.LinearScale is null)
+                throw new Exception("Linear scale configuration is required");
+
+            if (dto.LinearScale.MinValue >= dto.LinearScale.MaxValue)
+                throw new Exception("MinValue must be less than MaxValue");
+
+            if (dto.LinearScale.CorrectValue <
+                dto.LinearScale.MinValue ||
+                dto.LinearScale.CorrectValue >
+                dto.LinearScale.MaxValue)
+                throw new Exception("Correct value must be inside the scale range");
+
+            question.LinearScaleConfiguration =
+                new LinearScaleConfiguration
+                {
+                    MinValue = dto.LinearScale.MinValue,
+                    MaxValue = dto.LinearScale.MaxValue,
+                    MinLabel = dto.LinearScale.MinLabel,
+                    MaxLabel = dto.LinearScale.MaxLabel
+                };
+
+            question.CorrectAnswer =
+                new QuestionAnswerKey
+                {
+                    AnswerData =
+                        dto.LinearScale.CorrectValue.ToString()
+                };
+        }
+
+        private static void ConfigureShortAnswer(Question question, CreateQuestionDto dto)
+        {
+            if (dto.Text is null)
+                throw new Exception("Text configuration is required");
+
+            if (string.IsNullOrWhiteSpace(dto.Text.CorrectAnswer))
+                throw new Exception("Correct answer is required");
+
+            question.CorrectAnswer =
+                new QuestionAnswerKey
+                {
+                    AnswerData =
+                        dto.Text.CorrectAnswer.Trim()
+                };
+        }
+
+        private static void ConfigureParagraph(Question question)
+        {
+            // Paragraph questions do not have a correct answer.
+        }
+
+        #endregion
     }
 }
+
