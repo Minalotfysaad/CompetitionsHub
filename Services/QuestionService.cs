@@ -44,12 +44,7 @@ namespace CompetitionsTest.Services
 
             var question = await repo.FindAsync(
                 q => q.Id == id,
-                includes:
-                [
-                    "Options",
-                    "CorrectAnswer",
-                    "LinearScaleConfiguration"
-                ]);
+                includes:QuestionIncludes);
 
             if (question is null)
                 throw new Exception("Question not found");
@@ -71,12 +66,7 @@ namespace CompetitionsTest.Services
 
             var questions = await repo.FindAllAsync(
                 q => q.CompetitionDayId == competitionDayId,
-                includes:
-                [
-                    "Options",
-                    "CorrectAnswer",
-                    "LinearScaleConfiguration"
-                ]);
+                includes: QuestionIncludes);
 
             return _mapper.Map<IEnumerable<QuestionDto>>(questions);
         }
@@ -87,12 +77,7 @@ namespace CompetitionsTest.Services
 
             var question = await repo.FindAsync(
                 q => q.Id == id,
-                includes:
-                [
-                    "Options",
-                    "CorrectAnswer",
-                    "LinearScaleConfiguration"
-                ]);
+                includes: QuestionIncludes);
 
             if (question is null)
                 throw new Exception("Question not found");
@@ -125,8 +110,14 @@ namespace CompetitionsTest.Services
 
 
 
+        #region Helpers
 
-        #region Functions
+        private static readonly string[] QuestionIncludes =
+[
+    "Options",
+            "CorrectAnswer",
+            "LinearScaleConfiguration"
+];
         private static Question BuildQuestion(CreateQuestionDto dto)
         {
             return new Question
