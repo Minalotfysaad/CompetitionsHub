@@ -52,12 +52,20 @@ namespace CompetitionsTest.Services
 
             var day = await competitionDayRepo.FindAsync(
                 d => d.Id == id,
-                includes: new[] {"Questions"});
+                includes:
+                [
+                    "Questions",
+                    "Questions.Options",
+                    "Questions.CorrectAnswer",
+                    "Questions.LinearScaleConfiguration",
+                    "Questions.MultipleChoiceGridConfiguration"
+                ]);
 
             if (day is null)
                 throw new Exception("Competition day not found");
 
             var dto = _mapper.Map<CompetitionDayDto>(day);
+
             dto.DayTotalMark = day.Questions?.Sum(q => q.QuestionMark) ?? 0;
 
             return dto;
@@ -69,7 +77,14 @@ namespace CompetitionsTest.Services
 
             var days = await competitionDayRepo.FindAllAsync(
                 d => d.CompetitionId == competitionId,
-                includes: new[] { "Questions" });
+                includes:
+                [
+                    "Questions",
+                    "Questions.Options",
+                    "Questions.CorrectAnswer",
+                    "Questions.LinearScaleConfiguration",
+                    "Questions.MultipleChoiceGridConfiguration"
+                ]);
 
             return days.Select(d =>
             {
@@ -132,7 +147,14 @@ namespace CompetitionsTest.Services
                 d => d.CompetitionId == competitionId &&
                      d.StartDate <= now &&
                      d.EndDate >= now,
-                includes: new[] { "Questions" });
+               includes:
+                [
+                    "Questions",
+                    "Questions.Options",
+                    "Questions.CorrectAnswer",
+                    "Questions.LinearScaleConfiguration",
+                    "Questions.MultipleChoiceGridConfiguration"
+                ]);
 
             if (day is null)
                 return null;
