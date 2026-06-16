@@ -8,9 +8,14 @@ namespace CompetitionsTest.Mapping_Profiles
     {
         public CompetitionDayProfile()
         {
+            //ADMIN
             CreateMap<CreateCompetitionDayDto, CompetitionDay>();
             CreateMap<UpdateCompetitionDayDto, CompetitionDay>();
             CreateMap<CompetitionDay, CompetitionDayDto>();
+
+            //CONTESTANT
+            CreateMap<CompetitionDay, CompetitionDayContestantDto>();
+
         }
     }
 }

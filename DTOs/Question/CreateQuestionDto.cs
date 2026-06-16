@@ -13,9 +13,9 @@ namespace CompetitionsTest.DTOs.Question
             public int CompetitionDayId { get; set; }
 
             // Type-specific sections
-            public MultipleChoiceQuestionDto? MultipleChoice { get; set; }
-            public LinearScaleQuestionDto? LinearScale { get; set; }
-            public GridQuestionDto? Grid { get; set; }
+            public MultipleChoiceDto? MultipleChoice { get; set; }
+            public LinearScaleDto? LinearScale { get; set; }
+            public GridDto? Grid { get; set; }
             public TextQuestionDto? Text { get; set; }
     }
 }

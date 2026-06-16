@@ -8,7 +8,7 @@ namespace CompetitionsTest.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CompetitionDayController(IServiceManager _serviceManager) : ControllerBase
+    public class CompetitionDayAdminController(IServiceManager _serviceManager) : ControllerBase
     {
 
         [HttpPost]

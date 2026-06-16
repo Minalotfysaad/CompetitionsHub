@@ -292,7 +292,7 @@ namespace CompetitionsTest.Services
                 };
         }
 
-        private static void ValidateGrid(GridQuestionDto grid)
+        private static void ValidateGrid(GridDto grid)
         {
             if (!grid.Rows.Any())
                 throw new Exception("Grid must contain at least one row");

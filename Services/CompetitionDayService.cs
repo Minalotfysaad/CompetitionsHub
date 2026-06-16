@@ -11,6 +11,7 @@ namespace CompetitionsTest.Services
     public class CompetitionDayService(IUnitOfWork _unitOfWork, IMapper _mapper) : ICompetitionDayService
     {
 
+        // ADMIN 
         public async Task<CompetitionDayDto> CreateAsync(CreateCompetitionDayDto dto)
         {
             var competitionRepo = _unitOfWork.GetRepository<Competition, int>();
@@ -52,7 +53,7 @@ namespace CompetitionsTest.Services
 
             var day = await competitionDayRepo.FindAsync(
                 d => d.Id == id,
-                includes: IncludesList);
+                includes: AdminIncludesList);
 
             if (day is null)
                 throw new Exception("Competition day not found");
@@ -70,7 +71,7 @@ namespace CompetitionsTest.Services
 
             var days = await competitionDayRepo.FindAllAsync(
                 d => d.CompetitionId == competitionId,
-                includes: IncludesList);
+                includes: AdminIncludesList);
 
             return days.Select(d =>
             {
@@ -133,7 +134,7 @@ namespace CompetitionsTest.Services
                 d => d.CompetitionId == competitionId &&
                      d.StartDate <= now &&
                      d.EndDate >= now,
-               includes: IncludesList);
+               includes: AdminIncludesList);
 
             if (day is null)
                 return null;
@@ -144,8 +145,71 @@ namespace CompetitionsTest.Services
             return dto;
         }
 
+
+
+        // CONTESTANT 
+        public async Task<CompetitionDayContestantDto> GetByIdForContestantAsync(int id)
+        {
+            var competitionDayRepo =_unitOfWork.GetRepository<CompetitionDay, int>();
+
+            var day = await competitionDayRepo.FindAsync(
+                d => d.Id == id,
+                includes: ContestantIncludesList);
+
+            if (day is null)
+                throw new Exception("Competition day not found");
+
+            var dto = _mapper.Map<CompetitionDayContestantDto>(day);
+            dto.DayTotalMark =day.Questions?.Sum(q => q.QuestionMark) ?? 0;
+
+
+            return dto;
+        }
+
+        public async Task<IEnumerable<CompetitionDayContestantDto>>GetByCompetitionIdForContestantAsync(int competitionId)
+        {
+            var competitionDayRepo =_unitOfWork.GetRepository<CompetitionDay, int>();
+
+
+            var days = await competitionDayRepo.FindAllAsync(d => d.CompetitionId == competitionId,
+                includes: ContestantIncludesList);
+
+            return days.Select(day =>
+            {
+                var dto = _mapper.Map<CompetitionDayContestantDto>(day);
+
+                dto.DayTotalMark =
+                    day.Questions?.Sum(q => q.QuestionMark) ?? 0;
+
+                return dto;
+            });
+        }
+
+        public async Task<CompetitionDayContestantDto?>GetActiveDayForContestantAsync(int competitionId, DateTime now)
+        {
+            var competitionDayRepo =_unitOfWork.GetRepository<CompetitionDay, int>();
+
+
+            var day = await competitionDayRepo.FindAsync(
+                    d => d.CompetitionId == competitionId &&
+                    d.StartDate <= now &&
+                    d.EndDate >= now,
+                    includes: ContestantIncludesList);
+
+
+            if (day is null)
+                return null;
+
+            var dto = _mapper.Map<CompetitionDayContestantDto>(day);
+
+            dto.DayTotalMark =day.Questions?.Sum(q => q.QuestionMark) ?? 0;
+
+            return dto;
+        }
+
+
         #region Helpers
-        private static readonly string[] IncludesList =
+        private static readonly string[] AdminIncludesList =
         [
             "Questions",
             "Questions.Options",
@@ -155,7 +219,17 @@ namespace CompetitionsTest.Services
             "Questions.GridConfiguration.Rows",
             "Questions.GridConfiguration.Columns",
             "Questions.GridConfiguration.AnswerKeys"
-         ]; 
+         ];
+
+        private static readonly string[] ContestantIncludesList =
+        [
+            "Questions",
+            "Questions.Options",
+            "Questions.LinearScaleConfiguration",
+            "Questions.GridConfiguration",
+            "Questions.GridConfiguration.Rows",
+            "Questions.GridConfiguration.Columns"
+        ];
         #endregion
     }
 }
