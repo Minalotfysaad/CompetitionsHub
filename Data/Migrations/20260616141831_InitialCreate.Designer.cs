@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompetitionsTest.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260615113842_AddingDbSets")]
-    partial class AddingDbSets
+    [Migration("20260616141831_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -144,7 +144,7 @@ namespace CompetitionsTest.Data.Migrations
                     b.ToTable("Questions");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridAnswerKey", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridAnswerKey", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -170,7 +170,7 @@ namespace CompetitionsTest.Data.Migrations
                     b.ToTable("GridAnswerKeys");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridColumn", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridColumn", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -192,7 +192,26 @@ namespace CompetitionsTest.Data.Migrations
                     b.ToTable("GridColumns");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridRow", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridConfiguration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId")
+                        .IsUnique();
+
+                    b.ToTable("GridConfigurations");
+                });
+
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridRow", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -212,25 +231,6 @@ namespace CompetitionsTest.Data.Migrations
                     b.HasIndex("GridConfigurationId");
 
                     b.ToTable("GridRows");
-                });
-
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId")
-                        .IsUnique();
-
-                    b.ToTable("MultipleChoiceGridConfigurations");
                 });
 
             modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswerKey", b =>
@@ -311,9 +311,9 @@ namespace CompetitionsTest.Data.Migrations
                     b.Navigation("CompetitionDay");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridAnswerKey", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridAnswerKey", b =>
                 {
-                    b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", "GridConfiguration")
+                    b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridConfiguration", "GridConfiguration")
                         .WithMany("AnswerKeys")
                         .HasForeignKey("GridConfigurationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -322,9 +322,9 @@ namespace CompetitionsTest.Data.Migrations
                     b.Navigation("GridConfiguration");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridColumn", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridColumn", b =>
                 {
-                    b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", "GridConfiguration")
+                    b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridConfiguration", "GridConfiguration")
                         .WithMany("Columns")
                         .HasForeignKey("GridConfigurationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -333,26 +333,26 @@ namespace CompetitionsTest.Data.Migrations
                     b.Navigation("GridConfiguration");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.GridRow", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridConfiguration", b =>
                 {
-                    b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", "GridConfiguration")
+                    b.HasOne("CompetitionsTest.Models.QuestionModel.Question", "Question")
+                        .WithOne("GridConfiguration")
+                        .HasForeignKey("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridConfiguration", "QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridRow", b =>
+                {
+                    b.HasOne("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridConfiguration", "GridConfiguration")
                         .WithMany("Rows")
                         .HasForeignKey("GridConfigurationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("GridConfiguration");
-                });
-
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", b =>
-                {
-                    b.HasOne("CompetitionsTest.Models.QuestionModel.Question", "Question")
-                        .WithOne("MultipleChoiceGridConfiguration")
-                        .HasForeignKey("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", "QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.QuestionAnswerKey", b =>
@@ -391,14 +391,14 @@ namespace CompetitionsTest.Data.Migrations
                 {
                     b.Navigation("CorrectAnswer");
 
-                    b.Navigation("LinearScaleConfiguration");
+                    b.Navigation("GridConfiguration");
 
-                    b.Navigation("MultipleChoiceGridConfiguration");
+                    b.Navigation("LinearScaleConfiguration");
 
                     b.Navigation("Options");
                 });
 
-            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion.MultipleChoiceGridConfiguration", b =>
+            modelBuilder.Entity("CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion.GridConfiguration", b =>
                 {
                     b.Navigation("AnswerKeys");
 

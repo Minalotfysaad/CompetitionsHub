@@ -52,14 +52,7 @@ namespace CompetitionsTest.Services
 
             var day = await competitionDayRepo.FindAsync(
                 d => d.Id == id,
-                includes:
-                [
-                    "Questions",
-                    "Questions.Options",
-                    "Questions.CorrectAnswer",
-                    "Questions.LinearScaleConfiguration",
-                    "Questions.MultipleChoiceGridConfiguration"
-                ]);
+                includes: IncludesList);
 
             if (day is null)
                 throw new Exception("Competition day not found");
@@ -77,14 +70,7 @@ namespace CompetitionsTest.Services
 
             var days = await competitionDayRepo.FindAllAsync(
                 d => d.CompetitionId == competitionId,
-                includes:
-                [
-                    "Questions",
-                    "Questions.Options",
-                    "Questions.CorrectAnswer",
-                    "Questions.LinearScaleConfiguration",
-                    "Questions.MultipleChoiceGridConfiguration"
-                ]);
+                includes: IncludesList);
 
             return days.Select(d =>
             {
@@ -147,14 +133,7 @@ namespace CompetitionsTest.Services
                 d => d.CompetitionId == competitionId &&
                      d.StartDate <= now &&
                      d.EndDate >= now,
-               includes:
-                [
-                    "Questions",
-                    "Questions.Options",
-                    "Questions.CorrectAnswer",
-                    "Questions.LinearScaleConfiguration",
-                    "Questions.MultipleChoiceGridConfiguration"
-                ]);
+               includes: IncludesList);
 
             if (day is null)
                 return null;
@@ -164,5 +143,19 @@ namespace CompetitionsTest.Services
 
             return dto;
         }
+
+        #region Helpers
+        private static readonly string[] IncludesList =
+        [
+            "Questions",
+            "Questions.Options",
+            "Questions.CorrectAnswer",
+            "Questions.LinearScaleConfiguration",
+            "Questions.GridConfiguration",
+            "Questions.GridConfiguration.Rows",
+            "Questions.GridConfiguration.Columns",
+            "Questions.GridConfiguration.AnswerKeys"
+         ]; 
+        #endregion
     }
 }

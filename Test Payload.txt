@@ -1,0 +1,122 @@
+1. Multiple Choice
+{
+  "displayOrder": 1,
+  "title": "What is the capital of Egypt?",
+  "description": null,
+  "type": 3,
+  "isRequired": true,
+  "questionMark": 5,
+  "competitionDayId": 1,
+  "multipleChoice": {
+    "options": [
+      "Alexandria",
+      "Cairo",
+      "Aswan",
+      "Luxor"
+    ],
+    "correctOptionIndex": 1
+  }
+}
+
+
+
+
+
+2. Short Answer
+{
+  "displayOrder": 2,
+  "title": "Who discovered gravity?",
+  "description": null,
+  "type": 1,
+  "isRequired": true,
+  "questionMark": 5,
+  "competitionDayId": 1,
+  "text": {
+    "correctAnswer": "Isaac Newton"
+  }
+}
+
+
+
+
+
+3. Paragraph
+{
+  "displayOrder": 3,
+  "title": "Explain the theory of relativity",
+  "description": null,
+  "type": 2,
+  "isRequired": true,
+  "questionMark": 10,
+  "competitionDayId": 1
+}
+
+
+
+
+
+4. Linear Scale
+{
+  "displayOrder": 4,
+  "title": "Rate your understanding",
+  "description": null,
+  "type": 5,
+  "isRequired": true,
+  "questionMark": 2,
+  "competitionDayId": 1,
+  "linearScale": {
+    "minValue": 1,
+    "maxValue": 5,
+    "minLabel": "Poor",
+    "maxLabel": "Excellent",
+    "correctValue": 5
+  }
+}
+
+
+
+5. Grid
+{
+  "displayOrder": 2,
+  "title": "Match each country with its capital",
+  "description": "Choose the correct capital city.",
+  "type": 4,
+  "isRequired": true,
+  "questionMark": 20,
+  "competitionDayId": 1,
+
+  "grid": {
+    "rows": [
+      "Egypt",
+      "France",
+      "Germany",
+      "Italy"
+    ],
+
+    "columns": [
+      "Berlin",
+      "Rome",
+      "Paris",
+      "Cairo"
+    ],
+
+    "answerKeys": [
+      {
+        "rowKey": "Egypt",
+        "columnKey": "Cairo"
+      },
+      {
+        "rowKey": "France",
+        "columnKey": "Paris"
+      },
+      {
+        "rowKey": "Germany",
+        "columnKey": "Berlin"
+      },
+      {
+        "rowKey": "Italy",
+        "columnKey": "Rome"
+      }
+    ]
+  }
+}

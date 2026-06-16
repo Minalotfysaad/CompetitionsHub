@@ -15,8 +15,7 @@ namespace CompetitionsTest.DTOs.Question
             // Type-specific sections
             public MultipleChoiceQuestionDto? MultipleChoice { get; set; }
             public LinearScaleQuestionDto? LinearScale { get; set; }
-
-        //public GridQuestionDto? Grid { get; set; }
+            public GridQuestionDto? Grid { get; set; }
             public TextQuestionDto? Text { get; set; }
     }
 }

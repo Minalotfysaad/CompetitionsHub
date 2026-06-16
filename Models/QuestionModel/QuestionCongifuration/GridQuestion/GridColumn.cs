@@ -1,6 +1,6 @@
 ﻿using DomainLayer.Models;
 
-namespace CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion
+namespace CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion
 {
     public class GridColumn : BaseEntity<int>
     {
@@ -8,6 +8,6 @@ namespace CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleCh
 
         // Navigation
         public int GridConfigurationId { get; set; }
-        public MultipleChoiceGridConfiguration GridConfiguration { get; set; } = default!;
+        public GridConfiguration GridConfiguration { get; set; } = default!;
     }
 }

@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Models\QuestionModel\LinearScaleConfiguration.cs" />
+    <None Include="Models\QuestionModel\QuestionCongifuration\LinearScaleConfiguration.cs" />
   </ItemGroup>
 
 </Project>

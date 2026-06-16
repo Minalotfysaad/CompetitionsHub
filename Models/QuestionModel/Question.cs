@@ -1,6 +1,6 @@
 ﻿using CompetitionsTest.Enums;
 using CompetitionsTest.Models.QuestionModel.QuestionCongifuration;
-using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion;
+using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion;
 using DomainLayer.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,7 +18,7 @@ namespace CompetitionsTest.Models.QuestionModel
 
         // Question Configurations
         public LinearScaleConfiguration? LinearScaleConfiguration { get; set; }
-        public MultipleChoiceGridConfiguration? MultipleChoiceGridConfiguration { get; set; }
+        public GridConfiguration? GridConfiguration { get; set; }
         public ICollection<QuestionOption>? Options { get; set; }
         public QuestionAnswerKey? CorrectAnswer { get; set; }
 

@@ -1,7 +1,7 @@
 ﻿using CompetitionsTest.Models;
 using CompetitionsTest.Models.QuestionModel;
 using CompetitionsTest.Models.QuestionModel.QuestionCongifuration;
-using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.MultipleChoiceGridQuestion;
+using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 
@@ -25,7 +25,7 @@ namespace CompetitionsTest.Data
         public DbSet<QuestionOption> QuestionOptions { get; set; }
         public DbSet<QuestionAnswerKey> QuestionAnswerKeys { get; set; }
         public DbSet<LinearScaleConfiguration> LinearScaleConfigurations { get; set; }
-        public DbSet<MultipleChoiceGridConfiguration> MultipleChoiceGridConfigurations { get; set; }
+        public DbSet<GridConfiguration> GridConfigurations { get; set; }
         public DbSet<GridColumn> GridColumns { get; set; }
         public DbSet<GridRow> GridRows { get; set; }
         public DbSet<GridAnswerKey> GridAnswerKeys { get; set; }

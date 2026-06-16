@@ -4,6 +4,7 @@ using CompetitionsTest.Enums;
 using CompetitionsTest.Models;
 using CompetitionsTest.Models.QuestionModel;
 using CompetitionsTest.Models.QuestionModel.QuestionCongifuration;
+using CompetitionsTest.Models.QuestionModel.QuestionCongifuration.GridQuestion;
 using CompetitionsTest.ServiceAbstractions;
 using DomainLayer.Contracts;
 using GarasForms.Core;
@@ -114,10 +115,13 @@ namespace CompetitionsTest.Services
 
         private static readonly string[] QuestionIncludes =
             [
-            "Options",
-            "CorrectAnswer",
-            "LinearScaleConfiguration",
-            "MultipleChoiceGridConfiguration"
+                "Options",
+                "CorrectAnswer",
+                "LinearScaleConfiguration",
+                "GridConfiguration",
+                "GridConfiguration.Rows",
+                "GridConfiguration.Columns",
+                "GridConfiguration.AnswerKeys"
             ];
         private static Question BuildQuestion(CreateQuestionDto dto)
         {
@@ -137,14 +141,16 @@ namespace CompetitionsTest.Services
         {
             question.Title = dto.Title;
             question.Description = dto.Description;
+            question.Type = dto.Type;
             question.IsRequired = dto.IsRequired;
             question.QuestionMark = dto.QuestionMark;
             question.DisplayOrder = dto.DisplayOrder;
 
-            //Clear previous config
+            // Clear previous config
             question.Options?.Clear();
             question.CorrectAnswer = null;
             question.LinearScaleConfiguration = null;
+            question.GridConfiguration = null;
         }
 
         private static void ApplyQuestionTypeConfiguration(Question question, CreateQuestionDto dto)
@@ -166,12 +172,14 @@ namespace CompetitionsTest.Services
                 case QuestionType.Paragraph:
                     ConfigureParagraph(question);
                     break;
+                case QuestionType.Grid:
+                    ConfigureGrid(question, dto);
+                    break;
 
                 default:
                     throw new Exception("Unsupported question type");
             }
         }
-
 
         private static void ConfigureMultipleChoice(Question question, CreateQuestionDto dto)
         {
@@ -250,6 +258,76 @@ namespace CompetitionsTest.Services
         {
             // Paragraph questions do not have a correct answer.
         }
+
+        private static void ConfigureGrid(Question question,CreateQuestionDto dto)
+        {
+            if (dto.Grid is null)
+                throw new Exception("Grid configuration is required");
+
+            ValidateGrid(dto.Grid);
+
+            question.GridConfiguration = new GridConfiguration
+                {
+                    Rows = dto.Grid.Rows
+                        .Select(r => new GridRow
+                        {
+                            Text = r
+                        })
+                        .ToList(),
+
+                    Columns = dto.Grid.Columns
+                        .Select(c => new GridColumn
+                        {
+                            Text = c
+                        })
+                        .ToList(),
+
+                    AnswerKeys = dto.Grid.AnswerKeys
+                        .Select(a => new GridAnswerKey
+                        {
+                            RowKey = a.RowKey,
+                            ColumnKey = a.ColumnKey
+                        })
+                        .ToList()
+                };
+        }
+
+        private static void ValidateGrid(GridQuestionDto grid)
+        {
+            if (!grid.Rows.Any())
+                throw new Exception("Grid must contain at least one row");
+
+            if (!grid.Columns.Any())
+                throw new Exception("Grid must contain at least one column");
+
+            if (!grid.AnswerKeys.Any())
+                throw new Exception("Grid must contain at least one answer key");
+
+            if (grid.Rows.Count != grid.Rows.Distinct(StringComparer.OrdinalIgnoreCase).Count())
+                throw new Exception("Duplicate rows are not allowed");
+
+            if (grid.Columns.Count != grid.Columns.Distinct(StringComparer.OrdinalIgnoreCase).Count())
+                throw new Exception("Duplicate columns are not allowed");
+
+            foreach (var answer in grid.AnswerKeys)
+            {
+                if (!grid.Rows.Contains(answer.RowKey,StringComparer.OrdinalIgnoreCase))
+                    throw new Exception($"Row '{answer.RowKey}' does not exist");
+
+                if (!grid.Columns.Contains(answer.ColumnKey,StringComparer.OrdinalIgnoreCase))
+                    throw new Exception($"Column '{answer.ColumnKey}' does not exist");
+            }
+
+            bool duplicateAnswersForRow = grid.AnswerKeys.GroupBy(a => a.RowKey,StringComparer.OrdinalIgnoreCase).Any(g => g.Count() > 1);
+
+            if (duplicateAnswersForRow)
+                throw new Exception("A row can only have one correct answer");
+
+            foreach (var row in grid.Rows)
+                if (!grid.AnswerKeys.Any(a => string.Equals(a.RowKey,row,StringComparison.OrdinalIgnoreCase)))
+                    throw new Exception($"Row '{row}' is missing an answer");
+        }
+
 
         #endregion
     }

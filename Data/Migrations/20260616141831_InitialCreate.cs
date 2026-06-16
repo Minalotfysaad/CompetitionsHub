@@ -12,7 +12,7 @@ namespace CompetitionsTest.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Competition",
+                name: "Competitions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -22,7 +22,7 @@ namespace CompetitionsTest.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Competition", x => x.Id);
+                    table.PrimaryKey("PK_Competitions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -41,9 +41,9 @@ namespace CompetitionsTest.Data.Migrations
                 {
                     table.PrimaryKey("PK_CompetitionDays", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CompetitionDays_Competition_CompetitionId",
+                        name: "FK_CompetitionDays_Competitions_CompetitionId",
                         column: x => x.CompetitionId,
-                        principalTable: "Competition",
+                        principalTable: "Competitions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -74,6 +74,25 @@ namespace CompetitionsTest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GridConfigurations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    QuestionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GridConfigurations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GridConfigurations_Questions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "Questions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LinearScaleConfigurations",
                 columns: table => new
                 {
@@ -97,26 +116,7 @@ namespace CompetitionsTest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MultipleChoiceGridConfigurations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    QuestionId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MultipleChoiceGridConfigurations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MultipleChoiceGridConfigurations_Questions_QuestionId",
-                        column: x => x.QuestionId,
-                        principalTable: "Questions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "QuestionAnswerKey",
+                name: "QuestionAnswerKeys",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -126,9 +126,9 @@ namespace CompetitionsTest.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_QuestionAnswerKey", x => x.Id);
+                    table.PrimaryKey("PK_QuestionAnswerKeys", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_QuestionAnswerKey_Questions_QuestionId",
+                        name: "FK_QuestionAnswerKeys_Questions_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "Questions",
                         principalColumn: "Id",
@@ -156,7 +156,7 @@ namespace CompetitionsTest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GridAnswerKey",
+                name: "GridAnswerKeys",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -167,11 +167,11 @@ namespace CompetitionsTest.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GridAnswerKey", x => x.Id);
+                    table.PrimaryKey("PK_GridAnswerKeys", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GridAnswerKey_MultipleChoiceGridConfigurations_GridConfigurationId",
+                        name: "FK_GridAnswerKeys_GridConfigurations_GridConfigurationId",
                         column: x => x.GridConfigurationId,
-                        principalTable: "MultipleChoiceGridConfigurations",
+                        principalTable: "GridConfigurations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -189,9 +189,9 @@ namespace CompetitionsTest.Data.Migrations
                 {
                     table.PrimaryKey("PK_GridColumns", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GridColumns_MultipleChoiceGridConfigurations_GridConfigurationId",
+                        name: "FK_GridColumns_GridConfigurations_GridConfigurationId",
                         column: x => x.GridConfigurationId,
-                        principalTable: "MultipleChoiceGridConfigurations",
+                        principalTable: "GridConfigurations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -209,9 +209,9 @@ namespace CompetitionsTest.Data.Migrations
                 {
                     table.PrimaryKey("PK_GridRows", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GridRows_MultipleChoiceGridConfigurations_GridConfigurationId",
+                        name: "FK_GridRows_GridConfigurations_GridConfigurationId",
                         column: x => x.GridConfigurationId,
-                        principalTable: "MultipleChoiceGridConfigurations",
+                        principalTable: "GridConfigurations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -222,14 +222,20 @@ namespace CompetitionsTest.Data.Migrations
                 column: "CompetitionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GridAnswerKey_GridConfigurationId",
-                table: "GridAnswerKey",
+                name: "IX_GridAnswerKeys_GridConfigurationId",
+                table: "GridAnswerKeys",
                 column: "GridConfigurationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GridColumns_GridConfigurationId",
                 table: "GridColumns",
                 column: "GridConfigurationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GridConfigurations_QuestionId",
+                table: "GridConfigurations",
+                column: "QuestionId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_GridRows_GridConfigurationId",
@@ -243,14 +249,8 @@ namespace CompetitionsTest.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MultipleChoiceGridConfigurations_QuestionId",
-                table: "MultipleChoiceGridConfigurations",
-                column: "QuestionId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_QuestionAnswerKey_QuestionId",
-                table: "QuestionAnswerKey",
+                name: "IX_QuestionAnswerKeys_QuestionId",
+                table: "QuestionAnswerKeys",
                 column: "QuestionId",
                 unique: true);
 
@@ -269,7 +269,7 @@ namespace CompetitionsTest.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GridAnswerKey");
+                name: "GridAnswerKeys");
 
             migrationBuilder.DropTable(
                 name: "GridColumns");
@@ -281,13 +281,13 @@ namespace CompetitionsTest.Data.Migrations
                 name: "LinearScaleConfigurations");
 
             migrationBuilder.DropTable(
-                name: "QuestionAnswerKey");
+                name: "QuestionAnswerKeys");
 
             migrationBuilder.DropTable(
                 name: "QuestionOptions");
 
             migrationBuilder.DropTable(
-                name: "MultipleChoiceGridConfigurations");
+                name: "GridConfigurations");
 
             migrationBuilder.DropTable(
                 name: "Questions");
@@ -296,7 +296,7 @@ namespace CompetitionsTest.Data.Migrations
                 name: "CompetitionDays");
 
             migrationBuilder.DropTable(
-                name: "Competition");
+                name: "Competitions");
         }
     }
 }

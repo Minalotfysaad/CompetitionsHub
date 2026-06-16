@@ -15,5 +15,6 @@ namespace CompetitionsTest.DTOs.Question
         public string? CorrectAnswer { get; set; }
         public IEnumerable<QuestionOptionDto>? Options { get; set; }
         public LinearScaleDto? LinearScale { get; set; }
+        public GridQuestionDto? Grid { get; set; }
     }
 }
