@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
+using CompetitionsTest.Models.Identity;
 using CompetitionsTest.ServiceAbstractions;
 using CompetitionsTest.Services;
 using GarasForms.Core;
+using Microsoft.AspNetCore.Identity;
 using ServiceAbstraction;
 
 
 namespace Services
 {
-    public class ServiceManager(IUnitOfWork _unitOfWork, IMapper _mapper, IConfiguration _config) : IServiceManager
+    public class ServiceManager(IUnitOfWork _unitOfWork, IMapper _mapper, IConfiguration _config, UserManager<ApplicationUser> _userManager) : IServiceManager
     {
 
         // CompetitionService Lazy initializing
@@ -21,5 +23,9 @@ namespace Services
         // QuestionService Lazy initializing
         private readonly Lazy<IQuestionService> _lazyQuestionService = new Lazy<IQuestionService>(() => new QuestionService(_unitOfWork, _mapper));
         public IQuestionService QuestionService => _lazyQuestionService.Value;
+
+        // AuthService Lazy initializing
+        private readonly Lazy<IAuthService> _lazyAuthService = new Lazy<IAuthService>(() => new AuthService(_userManager));
+        public IAuthService AuthService => _lazyAuthService.Value;
     }
 }
