@@ -7,6 +7,5 @@
         MultipleChoice = 3,
         MultipleChoiceGrid = 4,
         LinearScale = 5,
-        FileUpload = 6
     }
 }

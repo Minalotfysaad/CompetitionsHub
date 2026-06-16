@@ -19,13 +19,16 @@ namespace CompetitionsTest.Data
         }
 
         //Dbsets Properties
+        public DbSet<Competition> Competitions { get; set; }
         public DbSet<CompetitionDay> CompetitionDays { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionOption> QuestionOptions { get; set; }
+        public DbSet<QuestionAnswerKey> QuestionAnswerKeys { get; set; }
+        public DbSet<LinearScaleConfiguration> LinearScaleConfigurations { get; set; }
         public DbSet<MultipleChoiceGridConfiguration> MultipleChoiceGridConfigurations { get; set; }
         public DbSet<GridColumn> GridColumns { get; set; }
         public DbSet<GridRow> GridRows { get; set; }
-        public DbSet<LinearScaleConfiguration> LinearScaleConfigurations { get; set; }
+        public DbSet<GridAnswerKey> GridAnswerKeys { get; set; }
 
 
 
