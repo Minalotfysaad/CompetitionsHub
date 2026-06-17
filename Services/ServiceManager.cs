@@ -27,5 +27,11 @@ namespace Services
         // AuthService Lazy initializing
         private readonly Lazy<IAuthService> _lazyAuthService = new Lazy<IAuthService>(() => new AuthService(_userManager));
         public IAuthService AuthService => _lazyAuthService.Value;
+
+        // SubmissionService Lazy initializing
+        private readonly Lazy<ISubmissionService> _lazySubmissionService = new Lazy<ISubmissionService>(() => new SubmissionService(_unitOfWork, _mapper));
+        public ISubmissionService SubmissionService => _lazySubmissionService.Value;
+
+
     }
 }

@@ -13,5 +13,6 @@ namespace ServiceAbstraction
         public ICompetitionDayService CompetitionDayService { get; }
         public IQuestionService QuestionService { get; }
         public IAuthService AuthService { get; }
+        public ISubmissionService SubmissionService { get; }
     }
 }

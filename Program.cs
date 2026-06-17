@@ -34,6 +34,7 @@ namespace CompetitionsTest
             builder.Services.AddAuthorization();
             builder.Services.AddScoped<IQuestionService, QuestionService>();
             builder.Services.AddScoped<ICompetitionDayService, CompetitionDayService>();
+            builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 
 
 
