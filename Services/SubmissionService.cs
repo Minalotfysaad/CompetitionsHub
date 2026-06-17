@@ -4,10 +4,11 @@ using CompetitionsTest.Enums;
 using CompetitionsTest.Models;
 using CompetitionsTest.ServiceAbstractions;
 using GarasForms.Core;
+using ServiceAbstraction;
 
 namespace CompetitionsTest.Services
 {
-    public class SubmissionService(IUnitOfWork _unitOfWork, IMapper _mapper) : ISubmissionService
+    public class SubmissionService(IUnitOfWork _unitOfWork, IMapper _mapper, IGradingService _gradingService) : ISubmissionService
     {
         public async Task<SubmissionDto> StartSubmissionAsync(StartSubmissionDto dto)
         {
@@ -69,7 +70,6 @@ namespace CompetitionsTest.Services
             if (submission is null)
                 throw new Exception("Submission not found");
 
-
             return _mapper.Map<SubmissionDto>(submission);
         }
 
@@ -85,10 +85,8 @@ namespace CompetitionsTest.Services
                     "CompetitionDay.Questions"
                 ]);
 
-
             if (submission is null)
                 throw new Exception("Submission not found");
-
 
             if (submission.Status != SubmissionStatus.InProgress)
                 throw new Exception("Submission already completed");
@@ -100,13 +98,13 @@ namespace CompetitionsTest.Services
             if (missing)
                 throw new Exception("Please answer all required questions");
 
-
             submission.Status = SubmissionStatus.Submitted;
             submission.SubmittedAt = DateTime.UtcNow;
 
             submissionRepo.Update(submission);
             await _unitOfWork.SaveChangesAsync();
 
+            await _gradingService.GradeSubmissionAsync(submission.Id); //Grading
 
             return _mapper.Map<SubmissionDto>(submission);
         }

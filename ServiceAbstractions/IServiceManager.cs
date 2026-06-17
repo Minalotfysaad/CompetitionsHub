@@ -14,5 +14,6 @@ namespace ServiceAbstraction
         public IQuestionService QuestionService { get; }
         public IAuthService AuthService { get; }
         public ISubmissionService SubmissionService { get; }
+        public IGradingService GradingService { get; }
     }
 }

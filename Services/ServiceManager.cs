@@ -9,7 +9,7 @@ using ServiceAbstraction;
 
 namespace Services
 {
-    public class ServiceManager(IUnitOfWork _unitOfWork, IMapper _mapper, IConfiguration _config, UserManager<ApplicationUser> _userManager) : IServiceManager
+    public class ServiceManager(IUnitOfWork _unitOfWork, IMapper _mapper, IConfiguration _config, UserManager<ApplicationUser> _userManager, IGradingService _gradingService) : IServiceManager
     {
 
         // CompetitionService Lazy initializing
@@ -29,8 +29,12 @@ namespace Services
         public IAuthService AuthService => _lazyAuthService.Value;
 
         // SubmissionService Lazy initializing
-        private readonly Lazy<ISubmissionService> _lazySubmissionService = new Lazy<ISubmissionService>(() => new SubmissionService(_unitOfWork, _mapper));
+        private readonly Lazy<ISubmissionService> _lazySubmissionService = new Lazy<ISubmissionService>(() => new SubmissionService(_unitOfWork, _mapper, _gradingService));
         public ISubmissionService SubmissionService => _lazySubmissionService.Value;
+
+        // GradingService Lazy initializing
+        private readonly Lazy<IGradingService> _lazyGradingService = new Lazy<IGradingService>(() => new GradingService(_unitOfWork));
+        public IGradingService GradingService => _lazyGradingService.Value;
 
 
     }
