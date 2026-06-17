@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CompetitionsTest.DTOs;
 using CompetitionsTest.DTOs.Competition;
 using CompetitionsTest.Helpers;
@@ -60,7 +60,16 @@ namespace CompetitionsTest.Services
 
             var competition = await repo.FindAsync(
                 c => c.Id == id,
-                includes: new[] { "Days" });
+                includes: new[] { 
+                    "Days",
+                    "Days.Questions",
+                    "Days.Questions.Options",
+                    "Days.Questions.LinearScaleConfiguration",
+                    "Days.Questions.GridConfiguration",
+                    "Days.Questions.GridConfiguration.Rows",
+                    "Days.Questions.GridConfiguration.Columns",
+                    "Days.Questions.GridConfiguration.AnswerKeys"
+                });
 
             if (competition is null)
                 throw new Exception($"Competition {id} not found");

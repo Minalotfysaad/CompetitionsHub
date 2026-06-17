@@ -29,4 +29,11 @@
     <None Include="Models\QuestionModel\QuestionCongifuration\LinearScaleConfiguration.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="scratch\**" />
+    <Content Remove="scratch\**" />
+    <EmbeddedResource Remove="scratch\**" />
+    <None Remove="scratch\**" />
+  </ItemGroup>
+
 </Project>

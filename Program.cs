@@ -1,4 +1,3 @@
-
 using CompetitionsTest.Data;
 using CompetitionsTest.Models.Identity;
 using CompetitionsTest.ServiceAbstractions;
@@ -19,47 +18,60 @@ namespace CompetitionsTest
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
+            // ── Database ──────────────────────────────────────────────────────
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            // ── Identity ──────────────────────────────────────────────────────
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication();
+            builder.Services.AddAuthorization();
+
+            // ── Application services ──────────────────────────────────────────
             builder.Services.AddAutoMapper(typeof(AssemblyReference).Assembly);
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-            builder.Services.AddAuthentication();
-            builder.Services.AddAuthorization();
             builder.Services.AddScoped<IQuestionService, QuestionService>();
             builder.Services.AddScoped<ICompetitionDayService, CompetitionDayService>();
             builder.Services.AddScoped<ISubmissionService, SubmissionService>();
             builder.Services.AddScoped<IGradingService, GradingService>();
             builder.Services.AddScoped<IManualGradingService, ManualGradingService>();
 
+            // ── CORS — allow the Vite dev frontend ────────────────────────────
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendDev", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
 
-
-
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            // ── Controllers & Swagger ─────────────────────────────────────────
+            builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // ── Build & pipeline ──────────────────────────────────────────────
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // CORS must be called before UseAuthentication / UseAuthorization
+            app.UseCors("FrontendDev");
 
             app.UseAuthentication();
-
             app.UseAuthorization();
-
 
             app.MapControllers();
 

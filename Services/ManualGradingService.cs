@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using CompetitionsTest.DTOs.Manual_Review;
 using CompetitionsTest.Enums;
 using CompetitionsTest.Models;
@@ -54,15 +54,18 @@ namespace CompetitionsTest.Services;
             if (responses is null)
                 throw new Exception("There is no responses to be reviewed in this day");
 
-        return responses.GroupBy(r => new
+        return responses.GroupBy(r =>
+                new
                 {
                     r.CompetitionSubmission.CompetitionDay.Id,
-                    r.CompetitionSubmission.CompetitionDay.DayNum
+                    r.CompetitionSubmission.CompetitionDay.DayNum,
+                    r.CompetitionSubmission.CompetitionDay.Title
                 })
                 .Select(g => new CompetitionDayManualReviewDto
                 {
-                    CompetitionDayId = g.Key.Id,
+                    Id = g.Key.Id,
                     DayNum = g.Key.DayNum,
+                    Title = g.Key.Title,
                     PendingResponsesCount = g.Count()
                 });
         }
@@ -90,6 +93,32 @@ namespace CompetitionsTest.Services;
                     Title = g.Key.Title,
                     QuestionMark = g.Key.QuestionMark,
                     PendingSubmissionsCount = g.Count()
+                });
+        }
+
+        public async Task<IEnumerable<ParagraphQuestionReviewDto>> GetGradedQuestionsAsync(int competitionDayId)
+        {
+            var repo = _unitOfWork.GetRepository<QuestionResponse, int>();
+            var responses = await repo.FindAllAsync(r =>
+                    r.Question.Type == QuestionType.Paragraph &&
+                    r.IsManuallyGraded &&
+                    r.Question.CompetitionDayId == competitionDayId,
+                includes: ["Question"]);
+
+            if (responses is null || !responses.Any())
+                return [];
+
+            return responses.GroupBy(r => new
+                {
+                    r.Question.Id,
+                    r.Question.Title,
+                    r.Question.QuestionMark
+                }).Select(g => new ParagraphQuestionReviewDto
+                {
+                    QuestionId = g.Key.Id,
+                    Title = g.Key.Title,
+                    QuestionMark = g.Key.QuestionMark,
+                    GradedSubmissionsCount = g.Count()
                 });
         }
 

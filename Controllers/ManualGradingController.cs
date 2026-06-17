@@ -1,4 +1,4 @@
-﻿using CompetitionsTest.DTOs.Manual_Review;
+using CompetitionsTest.DTOs.Manual_Review;
 using CompetitionsTest.ServiceAbstractions;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
@@ -34,6 +34,14 @@ namespace CompetitionsTest.Controllers
         public async Task<IActionResult> GetParagraphQuestions(int competitionDayId)
         {
             var result =await _serviceManager.ManualGradingService.GetParagraphQuestionsAsync(competitionDayId);
+            return Ok(result);
+        }
+
+        // Get paragraph questions that have already been graded (history)
+        [HttpGet("days/{competitionDayId:int}/graded-questions")]
+        public async Task<IActionResult> GetGradedQuestions(int competitionDayId)
+        {
+            var result = await _serviceManager.ManualGradingService.GetGradedQuestionsAsync(competitionDayId);
             return Ok(result);
         }
 

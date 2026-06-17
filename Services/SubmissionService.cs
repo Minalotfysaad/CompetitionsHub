@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CompetitionsTest.DTOs.Submission;
 using CompetitionsTest.Enums;
 using CompetitionsTest.Models;
@@ -15,7 +15,9 @@ namespace CompetitionsTest.Services
             var submissionRepo = _unitOfWork.GetRepository<CompetitionSubmission, int>();
 
             //Check if already submission exists
-            var existing = await submissionRepo.FindAsync(s =>s.UserId == dto.UserId && s.CompetitionDayId == dto.CompetitionDayId);
+            var existing = await submissionRepo.FindAsync(
+                s => s.UserId == dto.UserId && s.CompetitionDayId == dto.CompetitionDayId,
+                includes: new[] { "Responses" });
 
             if (existing is not null)
                 return _mapper.Map<SubmissionDto>(existing);
