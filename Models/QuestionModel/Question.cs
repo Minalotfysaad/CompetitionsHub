@@ -28,7 +28,6 @@ namespace CompetitionsTest.Models.QuestionModel
 
         // Not Mapped
         [NotMapped]
-        public bool IsAutomaticallyGradable =>
-            Type != QuestionType.Paragraph;
+        public bool IsAutomaticallyGradable => Type != QuestionType.Paragraph;
     }
 }

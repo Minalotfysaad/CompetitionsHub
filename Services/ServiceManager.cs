@@ -36,6 +36,10 @@ namespace Services
         private readonly Lazy<IGradingService> _lazyGradingService = new Lazy<IGradingService>(() => new GradingService(_unitOfWork));
         public IGradingService GradingService => _lazyGradingService.Value;
 
+        // ManualGradingService Lazy initializing
+        private readonly Lazy<IManualGradingService> _lazyManualGradingService = new Lazy<IManualGradingService>(() => new ManualGradingService(_unitOfWork));
+        public IManualGradingService ManualGradingService => _lazyManualGradingService.Value;
+
 
     }
 }

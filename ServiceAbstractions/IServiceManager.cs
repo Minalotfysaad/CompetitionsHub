@@ -1,4 +1,5 @@
 ﻿using CompetitionsTest.ServiceAbstractions;
+using CompetitionsTest.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace ServiceAbstraction
         public IAuthService AuthService { get; }
         public ISubmissionService SubmissionService { get; }
         public IGradingService GradingService { get; }
+        public IManualGradingService ManualGradingService { get; }
     }
 }
