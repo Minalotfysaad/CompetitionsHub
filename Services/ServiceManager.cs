@@ -40,6 +40,10 @@ namespace Services
         private readonly Lazy<IManualGradingService> _lazyManualGradingService = new Lazy<IManualGradingService>(() => new ManualGradingService(_unitOfWork));
         public IManualGradingService ManualGradingService => _lazyManualGradingService.Value;
 
+        // LeaderboardService Lazy initializing
+        private readonly Lazy<ILeaderboardService> _lazyLeaderboardService = new Lazy<ILeaderboardService>(() => new LeaderboardService(_unitOfWork));
+        public ILeaderboardService LeaderboardService => _lazyLeaderboardService.Value;
+
 
     }
 }

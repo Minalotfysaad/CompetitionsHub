@@ -40,6 +40,7 @@ namespace CompetitionsTest
             builder.Services.AddScoped<ISubmissionService, SubmissionService>();
             builder.Services.AddScoped<IGradingService, GradingService>();
             builder.Services.AddScoped<IManualGradingService, ManualGradingService>();
+            builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 
             // ── CORS — allow the Vite dev frontend ────────────────────────────
             builder.Services.AddCors(options =>
