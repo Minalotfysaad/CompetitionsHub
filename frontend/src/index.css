@@ -2,7 +2,7 @@
 
 /* ─── CSS Custom Properties ─────────────────────────────────────────────────── */
 :root {
-  /* Colors */
+  /* Colors — Dark (default) */
   --bg: #0d0f14;
   --surface: #161b27;
   --surface-2: #1e2535;
@@ -50,6 +50,62 @@
   --header-height: 64px;
 }
 
+/* ─── Light Mode ─────────────────────────────────────────────────────────────── */
+[data-theme="light"],
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-3: #f1f5f9;
+    --border: #e2e8f0;
+    --border-hover: #94a3b8;
+
+    --primary-light: rgba(99, 102, 241, 0.1);
+    --primary-glow: rgba(99, 102, 241, 0.2);
+
+    --success-bg: rgba(34, 197, 94, 0.1);
+    --warning-bg: rgba(245, 158, 11, 0.1);
+    --danger-bg: rgba(239, 68, 68, 0.1);
+    --info-bg: rgba(56, 189, 248, 0.1);
+
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #94a3b8;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --shadow-primary: 0 0 20px rgba(99, 102, 241, 0.2);
+  }
+}
+
+[data-theme="light"] {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --surface-3: #f1f5f9;
+  --border: #e2e8f0;
+  --border-hover: #94a3b8;
+
+  --primary-light: rgba(99, 102, 241, 0.1);
+  --primary-glow: rgba(99, 102, 241, 0.2);
+
+  --success-bg: rgba(34, 197, 94, 0.1);
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --info-bg: rgba(56, 189, 248, 0.1);
+
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-subtle: #94a3b8;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+  --shadow-primary: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
 /* ─── Reset ─────────────────────────────────────────────────────────────────── */
 *,
 *::before,
@@ -71,6 +127,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 img,
@@ -1793,4 +1850,61 @@ tbody tr.lb-top-row:hover {
     flex: 1;
     justify-content: center;
   }
+}
+
+/* ─── Theme Toggle ───────────────────────────────────────────────────────────── */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+  justify-content: space-between;
+}
+
+.theme-toggle:hover {
+  background: var(--surface-3);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+/* The sliding pill track */
+.theme-toggle-track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  transition: background var(--ease), border-color var(--ease);
+}
+
+[data-theme="light"] .theme-toggle-track {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-subtle);
+  transition: transform 0.25s var(--ease-spring), background 0.25s ease;
+}
+
+[data-theme="light"] .theme-toggle-thumb {
+  transform: translateX(16px);
+  background: #fff;
 }

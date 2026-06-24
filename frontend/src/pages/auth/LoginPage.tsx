@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Trophy, Eye, EyeOff, Shield, User as UserIcon } from 'lucide-react';
+import { Trophy, Eye, EyeOff, Shield, User as UserIcon, Sun, Moon } from 'lucide-react';
 import { authApi } from '../../api/auth';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import type { UserRole } from '../../types';
 import toast from 'react-hot-toast';
 
@@ -16,6 +17,7 @@ interface FormValues {
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { theme, toggle } = useTheme();
   const [role, setRole] = useState<UserRole>('contestant');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -45,6 +47,31 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page">
+      {/* Theme toggle — top-right corner */}
+      <button
+        onClick={toggle}
+        title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        style={{
+          position: 'fixed',
+          top: '1rem',
+          right: '1rem',
+          zIndex: 100,
+          width: 40,
+          height: 40,
+          borderRadius: 'var(--radius)',
+          border: '1px solid var(--border)',
+          background: 'var(--surface)',
+          color: 'var(--text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          transition: 'background var(--ease), border-color var(--ease), color var(--ease)',
+          boxShadow: 'var(--shadow-sm)',
+        }}
+      >
+        {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
+      </button>
       <div className="auth-card">
         <div className="auth-logo">
           <div className="auth-logo-icon">

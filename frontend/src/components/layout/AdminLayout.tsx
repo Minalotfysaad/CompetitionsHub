@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
   Trophy,
   LayoutDashboard,
@@ -7,6 +8,8 @@ import {
   LogOut,
   Menu,
   Medal,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -21,6 +24,7 @@ const navItems = [
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
+  const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -77,13 +81,80 @@ export default function AdminLayout() {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="sidebar-user" onClick={handleLogout} title="Logout">
-            <div className="sidebar-avatar">{initials}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="sidebar-user-name truncate">{user?.userName}</div>
-              <div className="sidebar-user-role">Administrator</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', padding: '0.25rem 0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+              <div className="sidebar-avatar">{initials}</div>
+              <div style={{ minWidth: 0 }}>
+                <div className="sidebar-user-name truncate">{user?.userName}</div>
+                <div className="sidebar-user-role">Administrator</div>
+              </div>
             </div>
-            <LogOut size={16} style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+              <button
+                onClick={toggle}
+                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface-2)',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'background var(--ease), border-color var(--ease), color var(--ease)',
+                  boxShadow: 'var(--shadow-sm)',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--surface-3)';
+                  e.currentTarget.style.borderColor = 'var(--border-hover)';
+                  e.currentTarget.style.color = 'var(--text)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--surface-2)';
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.color = 'var(--text-muted)';
+                }}
+              >
+                {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+              </button>
+
+              <button
+                onClick={handleLogout}
+                title="Logout"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface-2)',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'background var(--ease), border-color var(--ease), color var(--ease)',
+                  boxShadow: 'var(--shadow-sm)',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--surface-3)';
+                  e.currentTarget.style.borderColor = 'var(--border-hover)';
+                  e.currentTarget.style.color = 'var(--danger)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--surface-2)';
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.color = 'var(--text-muted)';
+                }}
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
