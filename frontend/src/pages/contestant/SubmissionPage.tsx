@@ -616,9 +616,16 @@ export default function SubmissionPage() {
           marginBottom: '2rem',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', marginBottom: '0.5rem' }}>
-          <div className="text-sm" style={{ fontWeight: 600 }}>
-            Progress: <span style={{ color: 'var(--primary)' }}>{answeredCount}</span> / {totalQuestions} answered
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', gap: '1rem' }}>
+          <div>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', margin: 0, lineHeight: 1.2 }}>
+              {day.title}
+            </h2>
+            <div className="text-xs text-muted" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.25rem' }}>
+              <span>Progress: <strong style={{ color: 'var(--primary)' }}>{answeredCount}</strong> / {totalQuestions} answered</span>
+              <span>•</span>
+              <span className="badge badge-success" style={{ padding: '0.1rem 0.4rem', fontSize: '0.65rem' }}>Live</span>
+            </div>
           </div>
           <div className="autosave-indicator">
             {globalSaveStatus === 'saving' && (<><div className="autosave-dot saving" /><span>Saving changes…</span></>)}

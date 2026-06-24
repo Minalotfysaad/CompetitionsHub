@@ -1,4 +1,4 @@
-using CompetitionsTest.DTOs;
+    using CompetitionsTest.DTOs;
 using CompetitionsTest.DTOs.Competition;
 using CompetitionsTest.Helpers;
 using Microsoft.AspNetCore.Mvc;
