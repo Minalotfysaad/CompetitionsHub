@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, ToggleLeft } from 'lucide-react';
 import { QuestionType, type CreateQuestionDto, type QuestionDto } from '../../types';
+
+// Frontend-only sentinel for True/False (submitted as MultipleChoice)
+const TF_TYPE = 'TrueFalse' as const;
+type ExtendedQuestionType = QuestionType | typeof TF_TYPE;
 
 interface Props {
   defaultValues?: QuestionDto;
@@ -10,8 +14,9 @@ interface Props {
   isPending?: boolean;
 }
 
-const QUESTION_TYPES = [
+const QUESTION_TYPES: { value: ExtendedQuestionType; label: string }[] = [
   { value: QuestionType.MultipleChoice, label: 'Multiple Choice' },
+  { value: TF_TYPE,                     label: 'True or False' },
   { value: QuestionType.ShortAnswer,    label: 'Short Answer' },
   { value: QuestionType.LinearScale,    label: 'Linear Scale' },
   { value: QuestionType.Grid,           label: 'Grid' },
@@ -43,7 +48,7 @@ interface FormValues {
 }
 
 export default function QuestionBuilder({ defaultValues, competitionDayId, onSubmit, isPending }: Props) {
-  const [questionType, setQuestionType] = useState<QuestionType>(
+  const [questionType, setQuestionType] = useState<ExtendedQuestionType>(
     defaultValues?.type ?? QuestionType.MultipleChoice
   );
 
@@ -116,10 +121,13 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
   }, [defaultValues, reset]);
 
   function buildDto(vals: FormValues): CreateQuestionDto {
+    // True/False is stored as MultipleChoice on the backend
+    const backendType = questionType === TF_TYPE ? QuestionType.MultipleChoice : questionType as QuestionType;
+
     const base = {
       title: vals.title,
       description: vals.description || undefined,
-      type: questionType,
+      type: backendType,
       displayOrder: Number(vals.displayOrder),
       isRequired: vals.isRequired,
       questionMark: Number(vals.questionMark),
@@ -127,6 +135,14 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
     };
 
     switch (questionType) {
+      case TF_TYPE:
+        return {
+          ...base,
+          multipleChoice: {
+            options: ['True', 'False'],
+            correctOptionIndex: Number(vals.mcCorrect),
+          },
+        };
       case QuestionType.MultipleChoice:
         return {
           ...base,
@@ -261,6 +277,45 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
             <Plus size={14} /> Add Option
           </button>
           <p className="form-hint" style={{ marginTop: '0.5rem' }}>Select the radio button next to the correct answer.</p>
+        </div>
+      )}
+
+      {/* TRUE OR FALSE */}
+      {questionType === TF_TYPE && (
+        <div className="builder-section">
+          <div className="builder-section-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ToggleLeft size={16} /> True or False Options
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {(['True', 'False'] as const).map((label, idx) => (
+              <div key={label} className="option-row">
+                <input
+                  type="radio"
+                  name="tf-correct"
+                  checked={Number(watch('mcCorrect')) === idx}
+                  onChange={() => setValue('mcCorrect', idx)}
+                  title="Mark as correct"
+                  style={{ width: 18, height: 18, accentColor: 'var(--primary)', flexShrink: 0 }}
+                />
+                <div
+                  className="form-input"
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'var(--surface-2)',
+                    color: 'var(--text-muted)',
+                    cursor: 'default',
+                    userSelect: 'none',
+                    fontWeight: 500,
+                  }}
+                >
+                  {label}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="form-hint" style={{ marginTop: '0.75rem' }}>Select the radio button next to the correct answer. Options are fixed.</p>
         </div>
       )}
 
