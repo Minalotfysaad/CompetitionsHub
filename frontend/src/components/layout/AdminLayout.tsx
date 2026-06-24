@@ -6,6 +6,7 @@ import {
   ClipboardCheck,
   LogOut,
   Menu,
+  Medal,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -13,6 +14,7 @@ const navItems = [
   { label: 'Navigation', items: [
     { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
     { to: '/admin/competitions', label: 'Competitions', icon: Trophy },
+    { to: '/admin/leaderboard', label: 'Leaderboard', icon: Medal },
     { to: '/admin/grading', label: 'Manual Grading', icon: ClipboardCheck },
   ]},
 ];

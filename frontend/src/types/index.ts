@@ -286,3 +286,31 @@ export interface AuthUser {
   email: string;
   role: UserRole;
 }
+// ─── Leaderboard ──────────────────────────────────────────────────────────────
+export interface CompetitionRankingDto {
+  rank: number;
+  userId: string;
+  userName: string;
+  totalScore: number;
+  percentage: number;
+}
+
+export interface CompetitionLeaderboardDto {
+  competitionId: number;
+  competitionTitle: string;
+  rankings: CompetitionRankingDto[];
+}
+
+export interface CompetitionDayRankingDto {
+  rank: number;
+  userId: string;
+  userName: string;
+  score: number;
+  percentage: number;
+}
+
+export interface CompetitionDayLeaderboardDto {
+  competitionDayId: number;
+  dayNum: number;
+  rankings: CompetitionDayRankingDto[];
+}

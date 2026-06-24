@@ -19,6 +19,7 @@ import CompetitionDetailPage from './pages/admin/competitions/CompetitionDetailP
 import DayFormPage from './pages/admin/days/DayFormPage';
 import QuestionBuilderPage from './pages/admin/questions/QuestionBuilderPage';
 import ManualGradingPage from './pages/admin/grading/ManualGradingPage';
+import LeaderboardPage from './pages/admin/leaderboard/LeaderboardPage';
 
 // Contestant Pages
 import CompetitionBrowserPage from './pages/contestant/CompetitionBrowserPage';
@@ -58,6 +59,7 @@ export default function App() {
                 <Route path="competitions/:competitionId/days/:dayId/questions/new" element={<QuestionBuilderPage />} />
                 <Route path="competitions/:competitionId/questions/:questionId/edit" element={<QuestionBuilderPage />} />
                 <Route path="grading" element={<ManualGradingPage />} />
+                <Route path="leaderboard" element={<LeaderboardPage />} />
               </Route>
             </Route>
 
