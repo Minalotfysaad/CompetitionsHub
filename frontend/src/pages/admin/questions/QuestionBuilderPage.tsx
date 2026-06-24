@@ -1,29 +1,14 @@
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, BookOpen, Award, CheckCircle2, Circle, Pencil, ListOrdered } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, Circle, ListOrdered } from 'lucide-react';
 import { questionsApi } from '../../../api/questions';
 import { competitionDaysApi } from '../../../api/competitionDays';
 import QuestionBuilder from '../../../components/questions/QuestionBuilder';
+import DraggableQuestionList from '../../../components/questions/DraggableQuestionList';
 import type { CreateQuestionDto } from '../../../types';
-import { QuestionType } from '../../../types';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
-
-const TYPE_LABELS: Record<number, string> = {
-  [QuestionType.ShortAnswer]:    'Short Answer',
-  [QuestionType.Paragraph]:      'Paragraph',
-  [QuestionType.MultipleChoice]: 'Multiple Choice',
-  [QuestionType.Grid]:           'Grid',
-  [QuestionType.LinearScale]:    'Linear Scale',
-};
-
-const TYPE_COLORS: Record<number, string> = {
-  [QuestionType.ShortAnswer]:    'badge-info',
-  [QuestionType.Paragraph]:      'badge-muted',
-  [QuestionType.MultipleChoice]: 'badge-primary',
-  [QuestionType.Grid]:           'badge-success',
-  [QuestionType.LinearScale]:    'badge-warning',
-};
 
 export default function QuestionBuilderPage() {
   const { competitionId, dayId, questionId } = useParams<{
@@ -82,10 +67,17 @@ export default function QuestionBuilderPage() {
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const questions = [...(dayData?.questions ?? [])].sort(
-    (a, b) => a.displayOrder - b.displayOrder
-  );
+  const questions = useMemo(() => {
+    return [...(dayData?.questions ?? [])].sort(
+      (a, b) => a.displayOrder - b.displayOrder
+    );
+  }, [dayData?.questions]);
   const totalMarks = questions.reduce((s, q) => s + (q.questionMark ?? 0), 0);
+
+  // Auto-compute the next display order for new questions
+  const nextDisplayOrder = questions.length > 0
+    ? Math.max(...questions.map((q) => q.displayOrder)) + 1
+    : 1;
 
   return (
     <div>
@@ -122,6 +114,7 @@ export default function QuestionBuilderPage() {
             competitionDayId={resolvedDayId}
             onSubmit={handleSubmit}
             isPending={isPending}
+            nextDisplayOrder={isEdit ? undefined : nextDisplayOrder}
           />
         </div>
 
@@ -206,7 +199,7 @@ export default function QuestionBuilderPage() {
                 marginBottom: '0.75rem',
               }}
             >
-              Questions
+              Questions — drag to reorder
             </div>
 
             {questions.length === 0 ? (
@@ -223,82 +216,16 @@ export default function QuestionBuilderPage() {
                 Save your first one!
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                {questions.map((q) => {
-                  const isCurrentlyEditing = isEdit && Number(questionId) === q.id;
-                  return (
-                    <div
-                      key={q.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '0.5rem',
-                        padding: '0.5rem 0.625rem',
-                        background: isCurrentlyEditing
-                          ? 'var(--primary-light)'
-                          : 'var(--surface-3)',
-                        borderRadius: 'var(--radius-sm)',
-                        border: isCurrentlyEditing
-                          ? '1px solid var(--primary)'
-                          : '1px solid transparent',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      {/* Order number */}
-                      <span
-                        style={{
-                          fontSize: '0.65rem',
-                          fontWeight: 700,
-                          color: 'var(--text-subtle)',
-                          minWidth: 18,
-                          paddingTop: 2,
-                        }}
-                      >
-                        #{q.displayOrder}
-                      </span>
-
-                      {/* Content */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: '0.8rem',
-                            fontWeight: 500,
-                            color: isCurrentlyEditing ? 'var(--primary)' : 'var(--text)',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
-                          title={q.title}
-                        >
-                          {q.title}
-                        </div>
-                        <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.2rem', flexWrap: 'wrap' }}>
-                          <span className={`badge ${TYPE_COLORS[q.type] ?? 'badge-muted'}`} style={{ fontSize: '0.65rem' }}>
-                            {TYPE_LABELS[q.type] ?? 'Unknown'}
-                          </span>
-                          <span className="badge badge-muted" style={{ fontSize: '0.65rem' }}>
-                            <Award size={9} /> {q.questionMark}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Edit link */}
-                      <Link
-                        to={`/admin/competitions/${competitionId}/questions/${q.id}/edit`}
-                        className="btn btn-ghost btn-icon"
-                        style={{ padding: '0.2rem', flexShrink: 0 }}
-                        title="Edit"
-                      >
-                        {isCurrentlyEditing ? (
-                          <CheckCircle2 size={13} style={{ color: 'var(--primary)' }} />
-                        ) : (
-                          <Pencil size={13} />
-                        )}
-                      </Link>
-                    </div>
-                  );
-                })}
-              </div>
+              <DraggableQuestionList
+                questions={questions}
+                competitionId={Number(competitionId)}
+                invalidateKeys={[
+                  ['competition', Number(competitionId)],
+                  ['day', resolvedDayId],
+                ]}
+                activeQuestionId={isEdit ? Number(questionId) : undefined}
+                compact
+              />
             )}
           </div>
         </div>

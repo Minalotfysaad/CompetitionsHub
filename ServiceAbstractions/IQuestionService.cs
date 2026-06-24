@@ -1,4 +1,4 @@
-﻿using CompetitionsTest.DTOs.Question;
+using CompetitionsTest.DTOs.Question;
 
 namespace CompetitionsTest.ServiceAbstractions
 {
@@ -9,5 +9,6 @@ namespace CompetitionsTest.ServiceAbstractions
         Task<IEnumerable<QuestionDto>> GetByCompetitionDayAsync(int competitionDayId);
         Task<QuestionDto> UpdateAsync(int id, CreateQuestionDto dto);
         Task DeleteAsync(int id);
+        Task ReorderAsync(IEnumerable<ReorderQuestionDto> items);
     }
 }

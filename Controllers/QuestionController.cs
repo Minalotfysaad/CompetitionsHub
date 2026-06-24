@@ -1,4 +1,4 @@
-﻿using CompetitionsTest.DTOs.Question;
+using CompetitionsTest.DTOs.Question;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
@@ -37,6 +37,13 @@ namespace CompetitionsTest.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _serviceManager.QuestionService.DeleteAsync(id);
+            return NoContent();
+        }
+
+        [HttpPatch("reorder")]
+        public async Task<IActionResult> Reorder([FromBody] List<ReorderQuestionDto> items)
+        {
+            await _serviceManager.QuestionService.ReorderAsync(items);
             return NoContent();
         }
     }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CompetitionsTest.DTOs.Question;
 using CompetitionsTest.Enums;
 using CompetitionsTest.Models;
@@ -104,6 +104,22 @@ namespace CompetitionsTest.Services
                 throw new Exception("Question not found");
 
             repo.Delete(question);
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task ReorderAsync(IEnumerable<ReorderQuestionDto> items)
+        {
+            var repo = _unitOfWork.GetRepository<Question, int>();
+
+            foreach (var item in items)
+            {
+                var question = await repo.GetByIdAsync(item.Id);
+                if (question is null) continue;
+
+                question.DisplayOrder = item.DisplayOrder;
+                repo.Update(question);
+            }
 
             await _unitOfWork.SaveChangesAsync();
         }

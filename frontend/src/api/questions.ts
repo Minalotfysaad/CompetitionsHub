@@ -13,4 +13,7 @@ export const questionsApi = {
 
   delete: (id: number) =>
     api.delete(`/api/Question/${id}`).then((r) => r.data),
+
+  reorder: (items: { id: number; displayOrder: number }[]) =>
+    api.patch('/api/Question/reorder', items).then((r) => r.data),
 };

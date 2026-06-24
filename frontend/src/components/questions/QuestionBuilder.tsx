@@ -12,6 +12,8 @@ interface Props {
   competitionDayId: number;
   onSubmit: (dto: CreateQuestionDto) => void;
   isPending?: boolean;
+  /** Auto-filled display order for new questions (count + 1) */
+  nextDisplayOrder?: number;
 }
 
 const QUESTION_TYPES: { value: ExtendedQuestionType; label: string }[] = [
@@ -47,7 +49,7 @@ interface FormValues {
   gridAnswers: Record<string, string>; // rowIdx -> colIdx
 }
 
-export default function QuestionBuilder({ defaultValues, competitionDayId, onSubmit, isPending }: Props) {
+export default function QuestionBuilder({ defaultValues, competitionDayId, onSubmit, isPending, nextDisplayOrder }: Props) {
   const [questionType, setQuestionType] = useState<ExtendedQuestionType>(
     defaultValues?.type ?? QuestionType.MultipleChoice
   );
@@ -57,7 +59,7 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
       title: '',
       description: '',
       type: QuestionType.MultipleChoice,
-      displayOrder: 1,
+      displayOrder: nextDisplayOrder ?? 1,
       isRequired: true,
       questionMark: 1,
       mcOptions: [{ text: '' }, { text: '' }],
@@ -73,6 +75,13 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
       gridAnswers: {},
     },
   });
+
+  // Sync auto-order when day data loads (create mode only)
+  useEffect(() => {
+    if (!defaultValues && nextDisplayOrder !== undefined) {
+      setValue('displayOrder', nextDisplayOrder);
+    }
+  }, [nextDisplayOrder, defaultValues, setValue]);
 
   const { fields: mcFields, append: mcAppend, remove: mcRemove } = useFieldArray({ control, name: 'mcOptions' });
   const { fields: rowFields, append: rowAppend, remove: rowRemove } = useFieldArray({ control, name: 'gridRows' });

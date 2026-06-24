@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Plus, Pencil, Trash2, Calendar, Clock, Award } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Calendar, Clock, Award, Pencil } from 'lucide-react';
 import { competitionsApi } from '../../../api/competitions';
 import { competitionDaysApi } from '../../../api/competitionDays';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import DraggableQuestionList from '../../../components/questions/DraggableQuestionList';
 
 export default function CompetitionDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -129,23 +130,17 @@ export default function CompetitionDetailPage() {
                 {/* Questions list */}
                 {day.questions && day.questions.length > 0 && (
                   <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.875rem' }}>
-                    <div className="text-xs text-subtle" style={{ marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Questions</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      {day.questions.sort((a, b) => a.displayOrder - b.displayOrder).map((q) => (
-                        <div key={q.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: 'var(--surface-2)', borderRadius: 'var(--radius-sm)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 0 }}>
-                            <span className="text-xs text-subtle" style={{ minWidth: 20 }}>#{q.displayOrder}</span>
-                            <span className="text-sm truncate" style={{ color: 'var(--text)' }}>{q.title}</span>
-                            <span className="badge badge-muted" style={{ fontSize: '0.7rem' }}>{questionTypeLabel(q.type)}</span>
-                          </div>
-                          <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
-                            <Link to={`/admin/competitions/${compId}/questions/${q.id}/edit`} className="btn btn-ghost btn-icon" style={{ padding: '0.25rem' }} title="Edit">
-                              <Pencil size={13} />
-                            </Link>
-                          </div>
-                        </div>
-                      ))}
+                    <div
+                      className="text-xs text-subtle"
+                      style={{ marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}
+                    >
+                      Questions — drag to reorder
                     </div>
+                    <DraggableQuestionList
+                      questions={day.questions}
+                      competitionId={compId}
+                      invalidateKeys={[['competition', compId]]}
+                    />
                   </div>
                 )}
               </div>
@@ -176,9 +171,4 @@ export default function CompetitionDetailPage() {
       )}
     </div>
   );
-}
-
-function questionTypeLabel(type: number) {
-  const map: Record<number, string> = { 1: 'Short Answer', 2: 'Paragraph', 3: 'Multiple Choice', 4: 'Grid', 5: 'Linear Scale' };
-  return map[type] ?? 'Unknown';
 }
