@@ -28,7 +28,7 @@ export default function DashboardPage() {
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">Welcome back — here's what needs your attention</p>
         </div>
-        <Link to="/admin/competitions/new" className="btn btn-primary">
+        <Link to="/admin/competitions" state={{ openNew: true }} className="btn btn-primary">
           <Trophy size={16} />
           New Competition
         </Link>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
           <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
             <Trophy size={40} style={{ color: 'var(--text-subtle)', margin: '0 auto 1rem' }} />
             <p style={{ marginBottom: '1rem' }}>No competitions yet</p>
-            <Link to="/admin/competitions/new" className="btn btn-primary">
+            <Link to="/admin/competitions" state={{ openNew: true }} className="btn btn-primary">
               Create your first competition
             </Link>
           </div>

@@ -1,14 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Trophy, Plus, Pencil, Trash2, Search, Save, X, Calendar } from 'lucide-react';
 import { competitionsApi } from '../../../api/competitions';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import type { CompetitionListDto } from '../../../types';
 
 export default function CompetitionListPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const location = useLocation();
   const [search, setSearch] = useState('');
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -17,6 +18,14 @@ export default function CompetitionListPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
+
+  useEffect(() => {
+    if (location.state?.openNew) {
+      setIsAdding(true);
+      // Clear location state to prevent repeating on reload
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['competitions'],
