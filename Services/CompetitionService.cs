@@ -38,6 +38,7 @@ namespace CompetitionsTest.Services
                 c => true,
                 queryParams.PageNumber,
                 queryParams.PageSize,
+                includes: new[] { "Days" },
                 orderBy: c => c.Id);
 
             var dtoItems = _mapper.Map<IEnumerable<CompetitionListDto>>(competitions);
@@ -62,6 +63,7 @@ namespace CompetitionsTest.Services
                 c => c.Days.Any() && now >= c.Days.Min(d => d.StartDate) && now <= c.Days.Max(d => d.EndDate),
                 queryParams.PageNumber,
                 queryParams.PageSize,
+                includes: new[] { "Days" },
                 orderBy: c => c.Id);
 
             var dtoItems = _mapper.Map<IEnumerable<CompetitionListDto>>(competitions);

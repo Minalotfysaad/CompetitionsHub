@@ -13,6 +13,7 @@ export interface CompetitionListDto {
   id: number;
   title: string;
   description?: string;
+  daysCount: number;
 }
 
 export interface CompetitionDto {

@@ -87,7 +87,7 @@ export default function QuestionBuilderPage() {
           <button
             className="btn btn-ghost btn-sm"
             style={{ marginBottom: '0.5rem' }}
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/admin/competitions')}
           >
             <ArrowLeft size={16} /> Back
           </button>
