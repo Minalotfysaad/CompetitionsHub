@@ -99,14 +99,7 @@ export default function QuestionBuilderPage() {
       </div>
 
       {/* Two-column layout */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 340px',
-          gap: '1.5rem',
-          alignItems: 'flex-start',
-        }}
-      >
+      <div className="question-builder-layout">
         {/* ── LEFT: Question Builder ── */}
         <div className="card" style={{ minWidth: 0 }}>
           <QuestionBuilder

@@ -218,8 +218,27 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
       </div>
 
       {/* Common fields */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '1rem', alignItems: 'flex-start' }}>
-        <div className="form-group">
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', width: '100%', flexWrap: 'wrap' }}>
+        {/* Order Display */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flexShrink: 0 }}>
+          <span className="form-label" style={{ margin: 0 }}>Order</span>
+          <div style={{
+            width: 44, height: 44,
+            background: 'var(--surface-3)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 700,
+            color: 'var(--text)',
+            fontSize: '1.1rem',
+          }}>
+            {watch('displayOrder')}
+          </div>
+          <input type="hidden" {...register('displayOrder', { valueAsNumber: true })} />
+        </div>
+
+        {/* Title */}
+        <div className="form-group" style={{ flex: 1, minWidth: '240px' }}>
           <label className="form-label" htmlFor="q-title">Question Title <span className="required">*</span></label>
           <input
             id="q-title"
@@ -230,22 +249,6 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
           />
           {errors.title && <span className="form-error">{errors.title.message}</span>}
         </div>
-        <div className="form-group" style={{ minWidth: 100 }}>
-          <label className="form-label" htmlFor="q-order">Order</label>
-          <input
-            id="q-order"
-            type="number"
-            min={1}
-            className="form-input"
-            readOnly
-            style={{ background: 'var(--surface-3)', cursor: 'not-allowed' }}
-            {...register('displayOrder', { min: 1, valueAsNumber: true })}
-          />
-        </div>
-        <div className="form-group" style={{ minWidth: 100 }}>
-          <label className="form-label" htmlFor="q-mark">Marks <span className="required">*</span></label>
-          <input id="q-mark" type="number" min={0} className="form-input" {...register('questionMark', { min: 0, valueAsNumber: true })} />
-        </div>
       </div>
 
       <div className="form-group">
@@ -253,9 +256,16 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
         <input id="q-desc" type="text" placeholder="Additional context for the question…" className="form-input" {...register('description')} />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <input id="q-required" type="checkbox" {...register('isRequired')} style={{ width: 16, height: 16, accentColor: 'var(--primary)' }} />
-        <label htmlFor="q-required" className="form-label" style={{ margin: 0, cursor: 'pointer' }}>Required question</label>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2rem', flexWrap: 'wrap' }}>
+        <div className="form-group" style={{ width: 140 }}>
+          <label className="form-label" htmlFor="q-mark">Marks <span className="required">*</span></label>
+          <input id="q-mark" type="number" min={0} className="form-input" {...register('questionMark', { min: 0, valueAsNumber: true })} />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingBottom: '0.75rem' }}>
+          <input id="q-required" type="checkbox" {...register('isRequired')} style={{ width: 16, height: 16, accentColor: 'var(--primary)' }} />
+          <label htmlFor="q-required" className="form-label" style={{ margin: 0, cursor: 'pointer' }}>Required question</label>
+        </div>
       </div>
 
       {/* ── Type-specific sections ── */}
