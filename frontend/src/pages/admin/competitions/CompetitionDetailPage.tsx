@@ -128,21 +128,42 @@ export default function CompetitionDetailPage() {
                 </div>
 
                 {/* Questions list */}
-                {day.questions && day.questions.length > 0 && (
-                  <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.875rem' }}>
-                    <div
-                      className="text-xs text-subtle"
-                      style={{ marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}
-                    >
-                      Questions — drag to reorder
+                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.875rem' }}>
+                  {day.questions && day.questions.length > 0 ? (
+                    <>
+                      <div
+                        className="text-xs text-subtle"
+                        style={{ marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}
+                      >
+                        Questions — drag to reorder
+                      </div>
+                      <DraggableQuestionList
+                        questions={day.questions}
+                        competitionId={compId}
+                        invalidateKeys={[['competition', compId]]}
+                      />
+                    </>
+                  ) : (
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-subtle)', marginBottom: '0.5rem' }}>
+                      No questions added to this day yet.
                     </div>
-                    <DraggableQuestionList
-                      questions={day.questions}
-                      competitionId={compId}
-                      invalidateKeys={[['competition', compId]]}
-                    />
-                  </div>
-                )}
+                  )}
+
+                  <Link
+                    to={`/admin/competitions/${compId}/days/${day.id}/questions/new`}
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      marginTop: '0.75rem',
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.375rem',
+                    }}
+                  >
+                    <Plus size={14} /> Add Question
+                  </Link>
+                </div>
               </div>
             );
           })}
