@@ -18,16 +18,19 @@ import {
   Send,
   Loader2,
   Check,
+  BookOpen,
 } from 'lucide-react';
 import { format, isPast } from 'date-fns';
 import toast from 'react-hot-toast';
 import {
   type QuestionContestantDto,
+  type QuestionDto,
   SubmissionStatus,
   QuestionType,
 } from '../../types';
 
-// Question Auto-Saving Wrapper
+// ─── Question Auto-Saving Wrapper ─────────────────────────────────────────────
+
 interface QuestionWrapperProps {
   question: QuestionContestantDto;
   submissionId: number;
@@ -45,7 +48,6 @@ function QuestionCardWrapper({
 }: QuestionWrapperProps) {
   const [val, setVal] = useState(initialValue);
 
-  // Sync state if initialValue changes from query refresh
   useEffect(() => {
     setVal(initialValue);
   }, [initialValue]);
@@ -71,6 +73,256 @@ function QuestionCardWrapper({
   );
 }
 
+// ─── Helper: render model answer for a question ───────────────────────────────
+
+function ModelAnswer({ adminQ }: { adminQ: QuestionDto }) {
+  if (adminQ.type === QuestionType.MultipleChoice) {
+    const idx = Number(adminQ.correctAnswer);
+    const text = adminQ.options?.[idx]?.text ?? `Option ${idx + 1}`;
+    return <span>{text}</span>;
+  }
+  if (adminQ.type === QuestionType.LinearScale) {
+    return <span>{adminQ.linearScale?.correctValue}</span>;
+  }
+  if (adminQ.type === QuestionType.Grid) {
+    const keys = adminQ.grid?.answerKeys ?? [];
+    if (keys.length === 0) return <span className="text-subtle">No answer key</span>;
+    return (
+      <ul style={{ listStyle: 'disc', paddingLeft: '1.25rem', margin: 0 }}>
+        {keys.map((k) => (
+          <li key={k.rowKey}><strong>{k.rowKey}</strong>: {k.columnKey}</li>
+        ))}
+      </ul>
+    );
+  }
+  if (adminQ.type === QuestionType.ShortAnswer) {
+    return <span>{adminQ.correctAnswer ?? '—'}</span>;
+  }
+  return <span className="text-subtle">Manually graded</span>;
+}
+
+// ─── Contestant answer display ────────────────────────────────────────────────
+
+function renderContestantAnswer(
+  question: QuestionContestantDto | QuestionDto,
+  answerData?: string
+) {
+  if (!answerData) return <span className="text-subtle">No answer provided</span>;
+  if (question.type === QuestionType.Grid) {
+    try {
+      const dict = JSON.parse(answerData);
+      return (
+        <ul style={{ listStyle: 'disc', paddingLeft: '1.25rem', margin: 0 }}>
+          {Object.entries(dict).map(([rKey, cKey]) => (
+            <li key={rKey}><strong>{rKey}</strong>: {String(cKey)}</li>
+          ))}
+        </ul>
+      );
+    } catch {
+      return <span>{answerData}</span>;
+    }
+  }
+  if (question.type === QuestionType.MultipleChoice) {
+    const opts = question.options as { id: number; text: string }[] | undefined;
+    return <span>{opts?.[Number(answerData)]?.text ?? `Option ${Number(answerData) + 1}`}</span>;
+  }
+  return <span style={{ whiteSpace: 'pre-wrap' }}>{answerData}</span>;
+}
+
+// ─── POST-DAY REVIEW PAGE (day has ended) ────────────────────────────────────
+
+interface ReviewPageProps {
+  compId: number;
+  dId: number;
+}
+
+function ReviewPage({ compId, dId }: ReviewPageProps) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Fetch contestant day (for question list + submission access)
+  const { data: day, isLoading: isDayLoading } = useQuery({
+    queryKey: ['contestant-day-details', dId],
+    queryFn: () => competitionDaysApi.contestantGetById(dId),
+    enabled: !!dId,
+  });
+
+  // Fetch admin day (model answers)
+  const { data: adminDay, isLoading: isAdminLoading } = useQuery({
+    queryKey: ['admin-day-answers', dId],
+    queryFn: () => competitionDaysApi.adminGetById(dId),
+    enabled: !!dId,
+  });
+
+  // Try to load existing submission (may not exist if user never participated)
+  const { data: submission, isLoading: isSubLoading } = useQuery({
+    queryKey: ['contestant-submission', dId, user?.id],
+    queryFn: () => submissionsApi.start({ competitionDayId: dId, userId: user?.id || '' }),
+    enabled: !!dId && !!user?.id,
+    refetchOnWindowFocus: false,
+  });
+
+  const isLoading = isDayLoading || isAdminLoading || isSubLoading;
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '6rem' }}>
+        <Loader2 className="spinner spinner-lg" style={{ marginBottom: '1rem', color: 'var(--primary)' }} />
+        <p className="text-muted">Loading review…</p>
+      </div>
+    );
+  }
+
+  if (!day || !adminDay) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon" style={{ color: 'var(--danger)' }}><AlertTriangle size={28} /></div>
+        <h3>Could not load review</h3>
+        <button className="btn btn-secondary" style={{ marginTop: '1rem' }} onClick={() => navigate(`/competitions/${compId}/days`)}>
+          <ArrowLeft size={16} /> Back to Days
+        </button>
+      </div>
+    );
+  }
+
+  const questions = [...(day.questions ?? [])].sort((a, b) => a.displayOrder - b.displayOrder);
+  const adminQMap = new Map<number, QuestionDto>((adminDay.questions ?? []).map((q) => [q.id, q]));
+  const responseMap = new Map<number, string>(
+    (submission?.responses ?? []).map((r) => [r.questionId, r.answerData ?? ''])
+  );
+  const isGraded = submission?.status === SubmissionStatus.Graded;
+  const isSubmitted = submission && submission.status !== SubmissionStatus.InProgress;
+
+  return (
+    <div style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '4rem' }}>
+      <button
+        className="btn btn-ghost btn-sm"
+        style={{ marginBottom: '1.5rem' }}
+        onClick={() => navigate(`/competitions/${compId}/days`)}
+      >
+        <ArrowLeft size={16} /> Back to Days
+      </button>
+
+      {/* Header */}
+      <div className="card" style={{ marginBottom: '2rem', background: 'var(--surface-2)', borderColor: 'var(--primary)', borderWidth: 1, borderStyle: 'solid' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+          <div className="stat-icon" style={{ background: 'var(--primary-light)', color: 'var(--primary)', width: 64, height: 64, borderRadius: '50%' }}>
+            <BookOpen size={30} />
+          </div>
+        </div>
+        <h2 style={{ textAlign: 'center', marginBottom: '0.25rem' }}>{day.title}</h2>
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+          This competition day has ended. Model answers are shown below.
+        </p>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          {isGraded && (
+            <span className="badge badge-success" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+              <Trophy size={13} /> Your score: {submission.totalScore ?? 0} / {day.dayTotalMark}
+              {' '}({(submission.percentage ?? 0).toFixed(0)}%)
+            </span>
+          )}
+          {isSubmitted && !isGraded && (
+            <span className="badge badge-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+              Submitted — Awaiting grading
+            </span>
+          )}
+          {!isSubmitted && (
+            <span className="badge badge-muted" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+              You did not participate in this day
+            </span>
+          )}
+          <span className="badge badge-muted" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+            <Clock size={13} /> Ended {format(new Date(day.endDate), 'MMM d, yyyy HH:mm')}
+          </span>
+        </div>
+      </div>
+
+      {/* Questions with model answers */}
+      <h3 style={{ marginBottom: '1rem' }}>
+        {isSubmitted ? 'Your Answers & Model Answers' : 'Model Answers'}
+      </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {questions.map((question, qIdx) => {
+          const adminQ = adminQMap.get(question.id);
+          const myAnswer = responseMap.get(question.id);
+          const resp = submission?.responses?.find((r) => r.questionId === question.id);
+
+          return (
+            <div key={question.id} className="card animate-fade-in" style={{ animationDelay: `${qIdx * 40}ms` }}>
+              {/* Question header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.75rem' }}>
+                <div>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-subtle)', marginBottom: '0.25rem' }}>
+                    Question {question.displayOrder}
+                  </div>
+                  <h4 style={{ color: 'var(--text)', fontWeight: 600 }}>{question.title}</h4>
+                  {question.description && <p className="text-sm" style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>{question.description}</p>}
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  {isGraded && resp && (
+                    <span
+                      className={`badge ${resp.isCorrect ? 'badge-success' : 'badge-danger'}`}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.25rem' }}
+                    >
+                      {resp.isCorrect ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                      {resp.isCorrect ? 'Correct' : 'Incorrect'}
+                    </span>
+                  )}
+                  <div className="text-sm text-subtle" style={{ marginTop: '0.25rem' }}>
+                    {isGraded && resp ? `${resp.earnedMark} / ` : ''}{question.questionMark} pts
+                  </div>
+                </div>
+              </div>
+
+              {/* Your answer (if participated) */}
+              {isSubmitted && (
+                <div style={{ background: 'var(--surface-2)', padding: '0.875rem 1rem', borderRadius: 'var(--radius)', marginBottom: '0.75rem' }}>
+                  <div className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.35rem', fontWeight: 600 }}>
+                    Your Answer:
+                  </div>
+                  <div className="text-sm" style={{ color: 'var(--text)' }}>
+                    {renderContestantAnswer(question, myAnswer)}
+                  </div>
+                  {resp?.reviewerComment && (
+                    <div style={{ borderLeft: '3px solid var(--primary)', background: 'rgba(99,102,241,0.05)', padding: '0.6rem 0.875rem', borderRadius: '0 var(--radius) var(--radius) 0', marginTop: '0.75rem' }}>
+                      <div className="text-xs text-muted" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.2rem', fontWeight: 600 }}>
+                        <Info size={12} /> Reviewer Comment:
+                      </div>
+                      <p className="text-sm" style={{ color: 'var(--text)', margin: 0 }}>{resp.reviewerComment}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Model answer */}
+              {adminQ && question.type !== QuestionType.Paragraph && (
+                <div style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.25)', padding: '0.875rem 1rem', borderRadius: 'var(--radius)' }}>
+                  <div className="text-xs" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.35rem', fontWeight: 700, color: 'var(--success)' }}>
+                    ✓ Model Answer:
+                  </div>
+                  <div className="text-sm" style={{ color: 'var(--text)' }}>
+                    <ModelAnswer adminQ={adminQ} />
+                  </div>
+                </div>
+              )}
+              {question.type === QuestionType.Paragraph && (
+                <div style={{ background: 'var(--surface-2)', padding: '0.875rem 1rem', borderRadius: 'var(--radius)' }}>
+                  <div className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                    Paragraph — Manually graded by admin
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN SUBMISSION PAGE ────────────────────────────────────────────────────
+
 export default function SubmissionPage() {
   const { competitionId, dayId } = useParams<{ competitionId: string; dayId: string }>();
   const compId = Number(competitionId);
@@ -83,22 +335,24 @@ export default function SubmissionPage() {
   const [answeredMap, setAnsweredMap] = useState<Record<number, boolean>>({});
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  // Fetch Contestant Day details (includes questions list)
+  // Fetch contestant day to determine if day has ended
   const { data: day, isLoading: isDayLoading, error: dayError } = useQuery({
     queryKey: ['contestant-day-details', dId],
     queryFn: () => competitionDaysApi.contestantGetById(dId),
     enabled: !!dId,
   });
 
-  // Start/Get Submission on enter
+  // If day has ended, delegate to ReviewPage
+  const dayEnded = day ? isPast(new Date(day.endDate)) : false;
+
+  // Only start submission if day is still active (not ended)
   const { data: submission, isLoading: isSubmissionLoading, error: subError } = useQuery({
     queryKey: ['contestant-submission', dId, user?.id],
     queryFn: () => submissionsApi.start({ competitionDayId: dId, userId: user?.id || '' }),
-    enabled: !!dId && !!user?.id,
-    refetchOnWindowFocus: false, // Prevent interrupting users typing
+    enabled: !!dId && !!user?.id && !dayEnded,
+    refetchOnWindowFocus: false,
   });
 
-  // Map initial values of answers from started submission responses
   const initialAnswers = useMemo(() => {
     if (!submission?.responses) return {};
     const map: Record<number, string> = {};
@@ -108,7 +362,6 @@ export default function SubmissionPage() {
     return map;
   }, [submission]);
 
-  // Sync answering progress map when submission loads
   useEffect(() => {
     if (day?.questions && submission?.responses) {
       const answers = initialAnswers;
@@ -120,19 +373,16 @@ export default function SubmissionPage() {
     }
   }, [day?.questions, submission?.responses, initialAnswers]);
 
-  // Handle question autosave status tracking
   const handleStatusChange = (questionId: number, status: 'saving' | 'saved' | 'error', isAnswered: boolean) => {
     setSaveStatuses((prev) => ({ ...prev, [questionId]: status }));
     setAnsweredMap((prev) => ({ ...prev, [questionId]: isAnswered }));
   };
 
-  // Submit Submission Mutation
   const submitMutation = useMutation({
     mutationFn: () => submissionsApi.submit(submission?.id ?? 0),
     onSuccess: (updatedSub) => {
       toast.success('Submission finalized successfully!');
       setIsConfirmOpen(false);
-      // Update cache
       queryClient.setQueryData(['contestant-submission', dId, user?.id], updatedSub);
     },
     onError: (err: any) => {
@@ -140,7 +390,6 @@ export default function SubmissionPage() {
     },
   });
 
-  // Calculate Overall Saving Status
   const globalSaveStatus = useMemo(() => {
     const statuses = Object.values(saveStatuses);
     if (statuses.includes('error')) return 'error';
@@ -149,15 +398,15 @@ export default function SubmissionPage() {
     return 'idle';
   }, [saveStatuses]);
 
-  // Calculate answered count
-  const answeredCount = useMemo(() => {
-    return Object.values(answeredMap).filter(Boolean).length;
-  }, [answeredMap]);
-
+  const answeredCount = useMemo(() => Object.values(answeredMap).filter(Boolean).length, [answeredMap]);
   const totalQuestions = day?.questions?.length ?? 0;
-  const isLate = day ? isPast(new Date(day.endDate)) : false;
 
-  // Render Loading states
+  // ── Day has ended → show review mode (no scoring) ──────────────────────────
+  if (!isDayLoading && day && dayEnded) {
+    return <ReviewPage compId={compId} dId={dId} />;
+  }
+
+  // ── Loading ────────────────────────────────────────────────────────────────
   const isLoading = isDayLoading || isSubmissionLoading;
   if (isLoading) {
     return (
@@ -168,7 +417,7 @@ export default function SubmissionPage() {
     );
   }
 
-  // Handle error cases
+  // ── Error state ────────────────────────────────────────────────────────────
   if (dayError || subError || !day || !submission) {
     return (
       <div className="empty-state">
@@ -182,7 +431,7 @@ export default function SubmissionPage() {
     );
   }
 
-  // RENDER SUBMISSION RESULT SCREEN (If already submitted, pending grading, or graded)
+  // ── Already submitted → show result screen ─────────────────────────────────
   const isCompleted = submission.status !== SubmissionStatus.InProgress;
 
   if (isCompleted) {
@@ -217,9 +466,7 @@ export default function SubmissionPage() {
               style={{
                 background: submission.status === SubmissionStatus.Graded ? 'var(--success-bg)' : 'var(--primary-light)',
                 color: submission.status === SubmissionStatus.Graded ? 'var(--success)' : 'var(--primary)',
-                width: '64px',
-                height: '64px',
-                borderRadius: '50%',
+                width: '64px', height: '64px', borderRadius: '50%',
               }}
             >
               <Trophy size={32} />
@@ -260,8 +507,7 @@ export default function SubmissionPage() {
           </div>
         </div>
 
-        {/* Responses Review */}
-        <h3 style={{ marginBottom: '1rem' }}>Submission Details & Feedback</h3>
+        <h3 style={{ marginBottom: '1rem' }}>Submission Details &amp; Feedback</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {day.questions.map((question, qIdx) => {
             const resp = (submission.responses ?? []).find((r) => r.questionId === question.id);
@@ -286,8 +532,7 @@ export default function SubmissionPage() {
                       </span>
                     )}
                     <div className="text-sm text-subtle" style={{ marginTop: '0.25rem' }}>
-                      {submission.status === SubmissionStatus.Graded ? `${earnedMark} / ` : ''}
-                      {question.questionMark} pts
+                      {submission.status === SubmissionStatus.Graded ? `${earnedMark} / ` : ''}{question.questionMark} pts
                     </div>
                   </div>
                 </div>
@@ -302,15 +547,11 @@ export default function SubmissionPage() {
                           return (
                             <ul style={{ listStyle: 'disc', paddingLeft: '1.25rem' }}>
                               {Object.entries(dict).map(([rKey, cKey]) => (
-                                <li key={rKey}>
-                                  <strong>{rKey}</strong>: {String(cKey)}
-                                </li>
+                                <li key={rKey}><strong>{rKey}</strong>: {String(cKey)}</li>
                               ))}
                             </ul>
                           );
-                        } catch {
-                          return resp.answerData;
-                        }
+                        } catch { return resp.answerData; }
                       })()
                     ) : question.type === QuestionType.MultipleChoice && resp?.answerData ? (
                       question.options?.[Number(resp.answerData)]?.text ?? `Option ${Number(resp.answerData) + 1}`
@@ -321,15 +562,7 @@ export default function SubmissionPage() {
                 </div>
 
                 {resp?.reviewerComment && (
-                  <div
-                    style={{
-                      borderLeft: '3px solid var(--primary)',
-                      background: 'rgba(99, 102, 241, 0.05)',
-                      padding: '0.75rem 1rem',
-                      borderRadius: '0 var(--radius) var(--radius) 0',
-                      marginTop: '1rem',
-                    }}
-                  >
+                  <div style={{ borderLeft: '3px solid var(--primary)', background: 'rgba(99, 102, 241, 0.05)', padding: '0.75rem 1rem', borderRadius: '0 var(--radius) var(--radius) 0', marginTop: '1rem' }}>
                     <div className="text-xs text-muted" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.25rem', fontWeight: 600 }}>
                       <Info size={12} /> Reviewer Comment:
                     </div>
@@ -344,10 +577,9 @@ export default function SubmissionPage() {
     );
   }
 
-  // ACTIVE SUBMISSION RUN SHEET
+  // ── ACTIVE SUBMISSION FORM ─────────────────────────────────────────────────
   return (
     <div className="animate-fade-up" style={{ maxWidth: '840px', margin: '0 auto', paddingBottom: '4rem' }}>
-      {/* Back navigation */}
       <button
         className="btn btn-ghost btn-sm"
         style={{ marginBottom: '1rem' }}
@@ -356,14 +588,13 @@ export default function SubmissionPage() {
         <ArrowLeft size={16} /> Back to Days
       </button>
 
-      {/* Header Info */}
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
         <div>
           <h1 className="page-title">{day.title}</h1>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
-            <span className="badge badge-primary">
+            <span className="badge badge-success">
               <Clock size={12} style={{ marginRight: '0.25rem' }} />
-              Active Day
+              Live Now
             </span>
             <span className="badge badge-muted">
               <Award size={12} style={{ marginRight: '0.25rem' }} />
@@ -373,31 +604,7 @@ export default function SubmissionPage() {
         </div>
       </div>
 
-      {/* Late Warning */}
-      {isLate && (
-        <div
-          className="card card-sm animate-fade-in"
-          style={{
-            background: 'var(--warning-bg)',
-            borderColor: 'var(--warning)',
-            color: 'var(--warning)',
-            marginBottom: '1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-          }}
-        >
-          <AlertTriangle size={20} style={{ flexShrink: 0 }} />
-          <div>
-            <strong style={{ display: 'block', fontSize: '0.9375rem' }}>Late Submission Warning</strong>
-            <span className="text-sm" style={{ color: 'rgba(245, 158, 11, 0.9)' }}>
-              The end date for this day has passed. You can still submit answers for practice, but they will not be recorded in public rankings.
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Sticky Progress & Saving Status */}
+      {/* Sticky Progress */}
       <div
         style={{
           position: 'sticky',
@@ -410,37 +617,14 @@ export default function SubmissionPage() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', marginBottom: '0.5rem' }}>
-          {/* Progress label */}
           <div className="text-sm" style={{ fontWeight: 600 }}>
             Progress: <span style={{ color: 'var(--primary)' }}>{answeredCount}</span> / {totalQuestions} answered
           </div>
-
-          {/* Autosave Global Indicator */}
           <div className="autosave-indicator">
-            {globalSaveStatus === 'saving' && (
-              <>
-                <div className="autosave-dot saving" />
-                <span>Saving changes…</span>
-              </>
-            )}
-            {globalSaveStatus === 'saved' && (
-              <>
-                <div className="autosave-dot saved" />
-                <span>All changes saved</span>
-              </>
-            )}
-            {globalSaveStatus === 'error' && (
-              <>
-                <div className="autosave-dot error" />
-                <span style={{ color: 'var(--danger)' }}>Error saving! Click to retry</span>
-              </>
-            )}
-            {globalSaveStatus === 'idle' && (
-              <>
-                <div className="autosave-dot saved" />
-                <span>Ready</span>
-              </>
-            )}
+            {globalSaveStatus === 'saving' && (<><div className="autosave-dot saving" /><span>Saving changes…</span></>)}
+            {globalSaveStatus === 'saved'  && (<><div className="autosave-dot saved"  /><span>All changes saved</span></>)}
+            {globalSaveStatus === 'error'  && (<><div className="autosave-dot error"  /><span style={{ color: 'var(--danger)' }}>Error saving!</span></>)}
+            {globalSaveStatus === 'idle'   && (<><div className="autosave-dot saved"  /><span>Ready</span></>)}
           </div>
         </div>
         <div className="progress-bar-track">
@@ -451,9 +635,9 @@ export default function SubmissionPage() {
         </div>
       </div>
 
-      {/* Questions list */}
+      {/* Questions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {day.questions.map((question) => {
+        {[...(day.questions ?? [])].sort((a, b) => a.displayOrder - b.displayOrder).map((question) => {
           const initialVal = initialAnswers[question.id] || '';
           return (
             <QuestionCardWrapper
@@ -467,7 +651,7 @@ export default function SubmissionPage() {
         })}
       </div>
 
-      {/* Submit Section */}
+      {/* Submit */}
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
         <button
           type="button"
@@ -479,7 +663,7 @@ export default function SubmissionPage() {
         </button>
       </div>
 
-      {/* SUBMISSION CONFIRMATION MODAL */}
+      {/* Confirmation Modal */}
       {isConfirmOpen && (
         <div className="modal-backdrop">
           <div className="modal animate-scale-in" style={{ maxWidth: '440px' }}>
@@ -494,20 +678,10 @@ export default function SubmissionPage() {
               <p>Once submitted, you will not be able to modify or add any further responses.</p>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setIsConfirmOpen(false)}
-                disabled={submitMutation.isPending}
-              >
+              <button type="button" className="btn btn-secondary" onClick={() => setIsConfirmOpen(false)} disabled={submitMutation.isPending}>
                 Cancel
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => submitMutation.mutate()}
-                disabled={submitMutation.isPending}
-              >
+              <button type="button" className="btn btn-primary" onClick={() => submitMutation.mutate()} disabled={submitMutation.isPending}>
                 {submitMutation.isPending ? <span className="spinner" /> : <Check size={16} />}
                 {submitMutation.isPending ? 'Submitting…' : 'Yes, Submit'}
               </button>

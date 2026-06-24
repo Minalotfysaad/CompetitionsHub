@@ -6,8 +6,8 @@ import { competitionsApi } from '../../api/competitions';
 export default function CompetitionBrowserPage() {
   const navigate = useNavigate();
   const { data, isLoading } = useQuery({
-    queryKey: ['competitions'],
-    queryFn: competitionsApi.getAll,
+    queryKey: ['competitions-active'],
+    queryFn: competitionsApi.getActive,
   });
   const competitions = data?.items ?? [];
 

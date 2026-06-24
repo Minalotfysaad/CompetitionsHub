@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { competitionDaysApi } from '../../api/competitionDays';
 import { competitionsApi } from '../../api/competitions';
-import { Calendar, Clock, Award, ArrowRight, AlertTriangle, ArrowLeft } from 'lucide-react';
-import { format, isPast, isFuture } from 'date-fns';
+import { Calendar, Clock, Award, ArrowRight, BookOpen, ArrowLeft, Lock } from 'lucide-react';
+import { format, isPast } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export default function CompetitionDayPage() {
   const { competitionId } = useParams<{ competitionId: string }>();
@@ -42,16 +43,16 @@ export default function CompetitionDayPage() {
         <div className="empty-state">
           <div className="empty-state-icon"><Calendar size={28} /></div>
           <h3>No days available yet</h3>
-          <p>Competition days haven't been published yet. Check back soon.</p>
+          <p>Competition days will appear here once they start. Check back soon.</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {days.sort((a, b) => a.dayNum - b.dayNum).map((day, i) => {
-            const start = new Date(day.startDate);
             const end = new Date(day.endDate);
+            const start = new Date(day.startDate);
             const isActive = day.isActive;
             const isPastDay = isPast(end);
-            const isUpcoming = isFuture(start);
+            const isUpcoming = start > new Date();
 
             return (
               <div
@@ -59,17 +60,21 @@ export default function CompetitionDayPage() {
                 className="day-card animate-fade-in"
                 style={{
                   animationDelay: `${i * 50}ms`,
-                  opacity: isUpcoming ? 0.65 : 1,
                   cursor: isUpcoming ? 'not-allowed' : 'pointer',
+                  opacity: isUpcoming ? 0.8 : 1,
                 }}
                 onClick={() => {
-                  if (!isUpcoming) navigate(`/competitions/${compId}/days/${day.id}/submit`);
+                  if (isUpcoming) {
+                    toast.error('This competition day has not started yet.');
+                    return;
+                  }
+                  navigate(`/competitions/${compId}/days/${day.id}/submit`);
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
                   <div className="day-num" style={{
-                    background: isActive ? 'var(--success-bg)' : isPastDay ? 'var(--surface-2)' : 'var(--primary-light)',
-                    color: isActive ? 'var(--success)' : isPastDay ? 'var(--text-subtle)' : 'var(--primary)',
+                    background: isActive ? 'var(--success-bg)' : (isPastDay || isUpcoming) ? 'var(--surface-2)' : 'var(--primary-light)',
+                    color: isActive ? 'var(--success)' : (isPastDay || isUpcoming) ? 'var(--text-subtle)' : 'var(--primary)',
                   }}>
                     {day.dayNum}
                   </div>
@@ -77,8 +82,12 @@ export default function CompetitionDayPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
                       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{day.title}</span>
                       {isActive   && <span className="badge badge-success">Live Now</span>}
-                      {isPastDay  && <span className="badge badge-muted">Past</span>}
-                      {isUpcoming && <span className="badge badge-info">Upcoming</span>}
+                      {isPastDay  && <span className="badge badge-muted">Ended — Review Available</span>}
+                      {isUpcoming && (
+                        <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                          Upcoming
+                        </span>
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                       <span className="text-sm text-muted" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -96,13 +105,17 @@ export default function CompetitionDayPage() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-                  {isPastDay && !isUpcoming && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.75rem', color: 'var(--warning)' }}>
-                      <AlertTriangle size={13} />
-                      Late — won't count in rankings
+                  {isPastDay && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.75rem', color: 'var(--primary)' }}>
+                      <BookOpen size={13} />
+                      View with Answers
                     </div>
                   )}
-                  {!isUpcoming && <ArrowRight size={18} style={{ color: 'var(--text-subtle)' }} />}
+                  {isUpcoming ? (
+                    <Lock size={18} style={{ color: 'var(--text-subtle)' }} />
+                  ) : (
+                    <ArrowRight size={18} style={{ color: 'var(--text-subtle)' }} />
+                  )}
                 </div>
               </div>
             );

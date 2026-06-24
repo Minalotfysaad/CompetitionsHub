@@ -53,6 +53,30 @@ namespace CompetitionsTest.Services
             };
         }
 
+        public async Task<PaginationResponse<CompetitionListDto>> GetActiveCompetitionsAsync(CompetitionQueryParams queryParams)
+        {
+            var repo = _unitOfWork.GetRepository<Competition, int>();
+            var now = DateTime.UtcNow;
+
+            var competitions = await repo.FindAllPagingAsync(
+                c => c.Days.Any() && now >= c.Days.Min(d => d.StartDate) && now <= c.Days.Max(d => d.EndDate),
+                queryParams.PageNumber,
+                queryParams.PageSize,
+                orderBy: c => c.Id);
+
+            var dtoItems = _mapper.Map<IEnumerable<CompetitionListDto>>(competitions);
+            return new PaginationResponse<CompetitionListDto>
+            {
+                Items = dtoItems,
+                CurrentPage = competitions.CurrentPage,
+                TotalPages = competitions.TotalPages,
+                PageSize = competitions.PageSize,
+                TotalCount = competitions.TotalCount,
+                StartFrom = competitions.StartFrom,
+                EndTo = competitions.EndTo
+            };
+        }
+
 
         public async Task<CompetitionDetailsDto> GetByIdAsync(int id)
         {

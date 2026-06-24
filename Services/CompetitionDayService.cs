@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CompetitionsTest.DTOs.CompetitionDay;
 using CompetitionsTest.Models;
 using CompetitionsTest.ServiceAbstractions;
@@ -159,6 +159,10 @@ namespace CompetitionsTest.Services
             if (day is null)
                 throw new Exception("Competition day not found");
 
+            var now = DateTime.UtcNow;
+            if (day.StartDate > now)
+                throw new Exception("This competition day has not started yet.");
+
             var dto = _mapper.Map<CompetitionDayContestantDto>(day);
             dto.DayTotalMark =day.Questions?.Sum(q => q.QuestionMark) ?? 0;
 
@@ -170,8 +174,8 @@ namespace CompetitionsTest.Services
         {
             var competitionDayRepo =_unitOfWork.GetRepository<CompetitionDay, int>();
 
-
-            var days = await competitionDayRepo.FindAllAsync(d => d.CompetitionId == competitionId,
+            var days = await competitionDayRepo.FindAllAsync(
+                d => d.CompetitionId == competitionId,
                 includes: ContestantIncludesList);
 
             return days.Select(day =>

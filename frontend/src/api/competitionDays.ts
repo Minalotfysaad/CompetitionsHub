@@ -11,6 +11,10 @@ export const competitionDaysApi = {
   getById: (id: number) =>
     api.get<CompetitionDayDto>(`/api/CompetitionDayAdmin/${id}`).then((r) => r.data),
 
+  // Also exposed for contestants reviewing a past day's model answers
+  adminGetById: (id: number) =>
+    api.get<CompetitionDayDto>(`/api/CompetitionDayAdmin/${id}`).then((r) => r.data),
+
   getByCompetition: (competitionId: number) =>
     api
       .get<CompetitionDayDto[]>(`/api/CompetitionDayAdmin/competition/${competitionId}`)

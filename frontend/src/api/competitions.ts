@@ -11,6 +11,9 @@ export const competitionsApi = {
   getAll: () =>
     api.get<PaginationResponse<CompetitionListDto>>('/api/Competition').then((r) => r.data),
 
+  getActive: () =>
+    api.get<PaginationResponse<CompetitionListDto>>('/api/Competition/active').then((r) => r.data),
+
   getById: (id: number) =>
     api.get<CompetitionDetailsDto>(`/api/Competition/${id}`).then((r) => r.data),
 

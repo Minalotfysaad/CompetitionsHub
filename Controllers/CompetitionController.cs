@@ -1,4 +1,4 @@
-﻿using CompetitionsTest.DTOs;
+using CompetitionsTest.DTOs;
 using CompetitionsTest.DTOs.Competition;
 using CompetitionsTest.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +30,13 @@ namespace CompetitionsTest.Controllers
         public async Task<ActionResult<PaginationResponse<CompetitionListDto>>> GetAllAsync([FromQuery] CompetitionQueryParams queryParams)
         {
             var result = await _serviceManager.CompetitionService.GetAllAsync(queryParams);
+            return Ok(result);
+        }
+        
+        [HttpGet("active")]
+        public async Task<ActionResult<PaginationResponse<CompetitionListDto>>> GetActiveAsync([FromQuery] CompetitionQueryParams queryParams)
+        {
+            var result = await _serviceManager.CompetitionService.GetActiveCompetitionsAsync(queryParams);
             return Ok(result);
         }
 

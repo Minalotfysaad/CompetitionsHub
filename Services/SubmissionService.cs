@@ -12,6 +12,14 @@ namespace CompetitionsTest.Services
     {
         public async Task<SubmissionDto> StartSubmissionAsync(StartSubmissionDto dto)
         {
+            var dayRepo = _unitOfWork.GetRepository<CompetitionDay, int>();
+            var day = await dayRepo.GetByIdAsync(dto.CompetitionDayId);
+            if (day == null)
+                throw new Exception("Competition day not found");
+
+            if (day.StartDate > DateTime.UtcNow)
+                throw new Exception("This competition day has not started yet.");
+
             var submissionRepo = _unitOfWork.GetRepository<CompetitionSubmission, int>();
 
             //Check if already submission exists
