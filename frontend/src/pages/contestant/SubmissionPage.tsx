@@ -579,6 +579,7 @@ export default function SubmissionPage() {
 
   // ── ACTIVE SUBMISSION FORM ─────────────────────────────────────────────────
   return (
+    <>
     <div className="animate-fade-up" style={{ maxWidth: '840px', margin: '0 auto', paddingBottom: '4rem' }}>
       <button
         className="btn btn-ghost btn-sm"
@@ -663,39 +664,41 @@ export default function SubmissionPage() {
         <button
           type="button"
           className="btn btn-primary btn-lg"
-          style={{ width: '100%', maxWidth: '320px' }}
+          style={{ minWidth: '140px' }}
           onClick={() => setIsConfirmOpen(true)}
         >
-          <Send size={18} /> Submit Day Responses
+          <Send size={18} /> Submit
         </button>
       </div>
 
-      {/* Confirmation Modal */}
-      {isConfirmOpen && (
-        <div className="modal-backdrop">
-          <div className="modal animate-scale-in" style={{ maxWidth: '440px' }}>
-            <h3 style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Send size={20} style={{ color: 'var(--primary)' }} />
-              Submit Answers?
-            </h3>
-            <div className="modal-body" style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', lineHeight: 1.5 }}>
-              <p style={{ marginBottom: '0.5rem' }}>
-                Are you sure you want to finalize your submission for <strong>{day.title}</strong>?
-              </p>
-              <p>Once submitted, you will not be able to modify or add any further responses.</p>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={() => setIsConfirmOpen(false)} disabled={submitMutation.isPending}>
-                Cancel
-              </button>
-              <button type="button" className="btn btn-primary" onClick={() => submitMutation.mutate()} disabled={submitMutation.isPending}>
-                {submitMutation.isPending ? <span className="spinner" /> : <Check size={16} />}
-                {submitMutation.isPending ? 'Submitting…' : 'Yes, Submit'}
-              </button>
-            </div>
+    </div>
+
+    {/* Confirmation Modal — outside the animated wrapper so position:fixed works correctly */}
+    {isConfirmOpen && (
+      <div className="modal-backdrop">
+        <div className="modal animate-scale-in" style={{ maxWidth: '440px' }}>
+          <h3 style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Send size={20} style={{ color: 'var(--primary)' }} />
+            Submit Answers?
+          </h3>
+          <div className="modal-body" style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', lineHeight: 1.5 }}>
+            <p style={{ marginBottom: '0.5rem' }}>
+              Are you sure you want to finalize your submission for <strong>{day.title}</strong>?
+            </p>
+            <p>Once submitted, you will not be able to modify or add any further responses.</p>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={() => setIsConfirmOpen(false)} disabled={submitMutation.isPending}>
+              Cancel
+            </button>
+            <button type="button" className="btn btn-primary" onClick={() => submitMutation.mutate()} disabled={submitMutation.isPending}>
+              {submitMutation.isPending ? <span className="spinner" /> : <Check size={16} />}
+              {submitMutation.isPending ? 'Submitting…' : 'Yes, Submit'}
+            </button>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+    </>
   );
 }
