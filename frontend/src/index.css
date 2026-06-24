@@ -1385,7 +1385,7 @@ tbody td {
 /* ─── Responsive ────────────────────────────────────────────────────────────── */
 .question-builder-layout {
   display: grid;
-  grid-template-columns: 1fr 450px;
+  grid-template-columns: 1fr 390px;
   gap: 1.5rem;
   align-items: flex-start;
 }
