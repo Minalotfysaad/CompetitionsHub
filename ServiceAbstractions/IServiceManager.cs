@@ -19,6 +19,7 @@ namespace ServiceAbstraction
         public IManualGradingService ManualGradingService { get; }
         public ILeaderboardService LeaderboardService { get; }
         public IContestantResultsService ContestantResultsService { get; }
+        public ICompetitionDayResultsService CompetitionDayResultsService { get; }
 
     }
 }

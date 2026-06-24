@@ -42,6 +42,7 @@ namespace CompetitionsTest
             builder.Services.AddScoped<IManualGradingService, ManualGradingService>();
             builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
             builder.Services.AddScoped<IContestantResultsService, ContestantResultsService>();
+            builder.Services.AddScoped<ICompetitionDayResultsService, CompetitionDayResultsService>();
 
             // ── CORS —─────────────────────────────────────────────────────────
             builder.Services.AddCors(options =>

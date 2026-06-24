@@ -48,6 +48,10 @@ namespace Services
         private readonly Lazy<IContestantResultsService> _lazyContestantResultsService = new Lazy<IContestantResultsService>(() => new ContestantResultsService(_unitOfWork));
         public IContestantResultsService ContestantResultsService => _lazyContestantResultsService.Value;
 
+        // CompetitionDayResultsService Lazy initializing
+        private readonly Lazy<ICompetitionDayResultsService> _lazyCompetitionDayResultsService = new Lazy<ICompetitionDayResultsService>(() => new CompetitionDayResultsService(_unitOfWork));
+        public ICompetitionDayResultsService CompetitionDayResultsService => _lazyCompetitionDayResultsService.Value;
+
 
     }
 }
