@@ -41,8 +41,9 @@ namespace CompetitionsTest
             builder.Services.AddScoped<IGradingService, GradingService>();
             builder.Services.AddScoped<IManualGradingService, ManualGradingService>();
             builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+            builder.Services.AddScoped<IContestantResultsService, ContestantResultsService>();
 
-            // ── CORS — allow the Vite dev frontend ────────────────────────────
+            // ── CORS —─────────────────────────────────────────────────────────
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("FrontendDev", policy =>
@@ -68,7 +69,6 @@ namespace CompetitionsTest
                 app.UseSwaggerUI();
             }
 
-            // CORS must be called before UseAuthentication / UseAuthorization
             app.UseCors("FrontendDev");
 
             app.UseAuthentication();

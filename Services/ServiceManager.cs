@@ -44,6 +44,10 @@ namespace Services
         private readonly Lazy<ILeaderboardService> _lazyLeaderboardService = new Lazy<ILeaderboardService>(() => new LeaderboardService(_unitOfWork));
         public ILeaderboardService LeaderboardService => _lazyLeaderboardService.Value;
 
+        // ContestantResultsService Lazy initializing
+        private readonly Lazy<IContestantResultsService> _lazyContestantResultsService = new Lazy<IContestantResultsService>(() => new ContestantResultsService(_unitOfWork));
+        public IContestantResultsService ContestantResultsService => _lazyContestantResultsService.Value;
+
 
     }
 }
