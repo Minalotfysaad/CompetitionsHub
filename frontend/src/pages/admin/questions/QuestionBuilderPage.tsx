@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, BookOpen, Award, Circle, ListOrdered } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, Circle, ListOrdered, Plus } from 'lucide-react';
 import { questionsApi } from '../../../api/questions';
 import { competitionDaysApi } from '../../../api/competitionDays';
 import QuestionBuilder from '../../../components/questions/QuestionBuilder';
@@ -227,6 +227,21 @@ export default function QuestionBuilderPage() {
                 compact
               />
             )}
+
+            <Link
+              to={`/admin/competitions/${competitionId}/days/${resolvedDayId}/questions/new`}
+              className="btn btn-secondary btn-sm"
+              style={{
+                marginTop: '0.75rem',
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.375rem',
+              }}
+            >
+              <Plus size={14} /> Add Question
+            </Link>
           </div>
         </div>
       </div>

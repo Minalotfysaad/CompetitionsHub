@@ -232,7 +232,15 @@ export default function QuestionBuilder({ defaultValues, competitionDayId, onSub
         </div>
         <div className="form-group" style={{ minWidth: 100 }}>
           <label className="form-label" htmlFor="q-order">Order</label>
-          <input id="q-order" type="number" min={1} className="form-input" {...register('displayOrder', { min: 1, valueAsNumber: true })} />
+          <input
+            id="q-order"
+            type="number"
+            min={1}
+            className="form-input"
+            readOnly
+            style={{ background: 'var(--surface-3)', cursor: 'not-allowed' }}
+            {...register('displayOrder', { min: 1, valueAsNumber: true })}
+          />
         </div>
         <div className="form-group" style={{ minWidth: 100 }}>
           <label className="form-label" htmlFor="q-mark">Marks <span className="required">*</span></label>
