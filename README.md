@@ -389,7 +389,7 @@ GitHub:
 https://github.com/Minalotfysaad
 
 LinkedIn:
-(Add your LinkedIn URL here)
+https://www.linkedin.com/in/minalotfysaad/
 
 ---
 
