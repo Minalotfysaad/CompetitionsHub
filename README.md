@@ -443,7 +443,7 @@ http://localhost:5173
 ```
 
 The frontend will communicate with the backend API running locally.
----
+
 
 # Author
 
