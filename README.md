@@ -6,6 +6,61 @@ CompetitionsHub is designed to support competitions consisting of multiple compe
 
 ---
 
+# Screenshots
+
+## Login
+
+![Login](docs/screenshots/login.png)
+
+---
+
+## Admin Dashboard
+
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+---
+
+## Competition Management
+
+![Competition Management](docs/screenshots/competitions.png)
+
+---
+
+## Question Builder
+
+![Question Builder](docs/screenshots/question-builder.png)
+
+---
+
+## Contestant Competition
+
+![Contestant Competition](docs/screenshots/contestant-page.png)
+
+---
+
+## Manual Grading
+
+![Manual Grading](docs/screenshots/manual-grading.png)
+
+---
+
+## Leaderboards
+
+![Leaderboard](docs/screenshots/leaderboard.png)
+
+---
+
+## Contestant Results
+
+![Contestant Results](docs/screenshots/results.png)
+
+---
+
+## Swagger Documentation
+
+![Swagger](docs/screenshots/swagger.png)
+
+
 # Features
 
 ## Authentication & Authorization
