@@ -1,11 +1,13 @@
     using CompetitionsTest.DTOs;
 using CompetitionsTest.DTOs.Competition;
 using CompetitionsTest.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 
 namespace CompetitionsTest.Controllers
 {
+    [Authorize(Roles = "admins")]
     [ApiController]
     [Route("api/[controller]")]
     public class CompetitionController(IServiceManager _serviceManager) : ControllerBase
@@ -33,6 +35,8 @@ namespace CompetitionsTest.Controllers
             return Ok(result);
         }
         
+        [AllowAnonymous] // Replaced with roles or kept AllowAnonymous? wait, let's use [Authorize(Roles = "admins,contestants")]
+        [Authorize(Roles = "admins,contestants")]
         [HttpGet("active")]
         public async Task<ActionResult<PaginationResponse<CompetitionListDto>>> GetActiveAsync([FromQuery] CompetitionQueryParams queryParams)
         {

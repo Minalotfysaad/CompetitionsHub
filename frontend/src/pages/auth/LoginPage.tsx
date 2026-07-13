@@ -18,7 +18,6 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { theme, toggle } = useTheme();
-  const [role, setRole] = useState<UserRole>('contestant');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -31,13 +30,14 @@ export default function LoginPage() {
   async function onSubmit(values: FormValues) {
     setLoading(true);
     try {
-      const userId = await authApi.login({
+      const response = await authApi.login({
         email: values.email,
         password: values.password,
       });
-      login(userId, values.email.split('@')[0], values.email, role);
+      const mappedRole = response.role === 'admins' ? 'admin' : 'contestant';
+      login(response.userId, values.email.split('@')[0], values.email, mappedRole, response.token);
       toast.success('Welcome back!');
-      navigate(role === 'admin' ? '/admin' : '/competitions', { replace: true });
+      navigate(mappedRole === 'admin' ? '/admin' : '/competitions', { replace: true });
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Login failed. Check your credentials.');
     } finally {
@@ -80,31 +80,6 @@ export default function LoginPage() {
           <div>
             <div className="auth-title">CompetitionHub</div>
             <div className="auth-subtitle">Sign in to your account</div>
-          </div>
-        </div>
-
-        {/* Role selector */}
-        <div>
-          <label className="form-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
-            I am a…
-          </label>
-          <div className="role-toggle">
-            <button
-              type="button"
-              className={`role-btn${role === 'contestant' ? ' active' : ''}`}
-              onClick={() => setRole('contestant')}
-            >
-              <UserIcon size={15} style={{ display: 'inline', marginRight: 6 }} />
-              Contestant
-            </button>
-            <button
-              type="button"
-              className={`role-btn${role === 'admin' ? ' active' : ''}`}
-              onClick={() => setRole('admin')}
-            >
-              <Shield size={15} style={{ display: 'inline', marginRight: 6 }} />
-              Administrator
-            </button>
           </div>
         </div>
 

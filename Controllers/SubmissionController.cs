@@ -1,10 +1,12 @@
-﻿using CompetitionsTest.DTOs.Submission;
+using CompetitionsTest.DTOs.Submission;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 
 namespace CompetitionsTest.Controllers
 {
+    [Authorize(Roles = "contestants")]
     [Route("api/[controller]")]
     [ApiController]
     public class SubmissionController(IServiceManager _serviceManager) : ControllerBase

@@ -1,11 +1,13 @@
-﻿using CompetitionsTest.DTOs.CompetitionDay;
+using CompetitionsTest.DTOs.CompetitionDay;
 using CompetitionsTest.ServiceAbstractions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 
 namespace CompetitionsTest.Controllers
 {
+    [Authorize(Roles = "contestants")]
     [ApiController]
     [Route("api/[controller]")]
     public class CompetitionDayContestantController(IServiceManager _serviceManager) : ControllerBase

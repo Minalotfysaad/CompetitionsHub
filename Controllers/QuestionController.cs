@@ -1,10 +1,12 @@
 using CompetitionsTest.DTOs.Question;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 
 namespace CompetitionsTest.Controllers
 {
+    [Authorize(Roles = "admins")]
     [Route("api/[controller]")]
     [ApiController]
     public class QuestionController(IServiceManager _serviceManager)

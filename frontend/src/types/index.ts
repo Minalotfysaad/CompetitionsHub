@@ -285,6 +285,13 @@ export interface AuthUser {
   userName: string;
   email: string;
   role: UserRole;
+  token: string;
+}
+
+export interface AuthResponseDto {
+  userId: string;
+  token: string;
+  role: string;
 }
 // ─── Leaderboard ──────────────────────────────────────────────────────────────
 export interface CompetitionRankingDto {

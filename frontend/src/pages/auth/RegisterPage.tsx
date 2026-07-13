@@ -15,6 +15,7 @@ interface FormValues {
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { theme, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 

@@ -1,10 +1,12 @@
 using CompetitionsTest.DTOs.Manual_Review;
 using CompetitionsTest.ServiceAbstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 
 namespace CompetitionsTest.Controllers
 {
+    [Authorize(Roles = "admins")]
     [ApiController]
     [Route("api/[controller]")]
     public class ManualGradingController(IServiceManager _serviceManager) : ControllerBase

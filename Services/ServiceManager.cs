@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CompetitionsTest.Models.Identity;
 using CompetitionsTest.ServiceAbstractions;
 using CompetitionsTest.Services;
@@ -25,7 +25,7 @@ namespace Services
         public IQuestionService QuestionService => _lazyQuestionService.Value;
 
         // AuthService Lazy initializing
-        private readonly Lazy<IAuthService> _lazyAuthService = new Lazy<IAuthService>(() => new AuthService(_userManager));
+        private readonly Lazy<IAuthService> _lazyAuthService = new Lazy<IAuthService>(() => new AuthService(_userManager, _config));
         public IAuthService AuthService => _lazyAuthService.Value;
 
         // SubmissionService Lazy initializing

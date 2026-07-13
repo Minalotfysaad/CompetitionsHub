@@ -6,16 +6,28 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach userId to every request (temp until JWT)
+// Attach token to every request
 api.interceptors.request.use((config) => {
   const raw = localStorage.getItem('auth_user');
   if (raw) {
     const user = JSON.parse(raw);
-    if (user?.id) {
-      config.headers['X-User-Id'] = user.id;
+    if (user?.token) {
+      config.headers['Authorization'] = `Bearer ${user.token}`;
     }
   }
   return config;
 });
+
+// Handle 401 Unauthorized responses globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('auth_user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

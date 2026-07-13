@@ -3,7 +3,7 @@ import type { AuthUser, UserRole } from '../types';
 
 interface AuthContextValue {
   user: AuthUser | null;
-  login: (id: string, userName: string, email: string, role: UserRole) => void;
+  login: (id: string, userName: string, email: string, role: UserRole, token: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -15,7 +15,13 @@ const STORAGE_KEY = 'auth_user';
 function loadUser(): AuthUser | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as AuthUser) : null;
+    if (!raw) return null;
+    const user = JSON.parse(raw) as AuthUser;
+    if (!user.token) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return user;
   } catch {
     return null;
   }
@@ -25,8 +31,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(loadUser);
 
   const login = useCallback(
-    (id: string, userName: string, email: string, role: UserRole) => {
-      const authUser: AuthUser = { id, userName, email, role };
+    (id: string, userName: string, email: string, role: UserRole, token: string) => {
+      const authUser: AuthUser = { id, userName, email, role, token };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
       setUser(authUser);
     },
