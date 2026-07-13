@@ -53,7 +53,7 @@ CompetitionsHub is designed to support competitions consisting of multiple compe
 
 ## Swagger Documentation
 
-![Swagger](docs/screenshots/swagger.png)
+![Swagger](docs/screenshots/swagger.PNG)
 
 
 # Features
@@ -390,19 +390,12 @@ Contains Paragraph Questions?
 
 ---
 
-# Future Improvements
+## Frontend
 
-- File Upload Questions
-- Timed Exams
-- Anti-cheating Features
-- Email Notifications
-- Certificate Generation
-- Real-time Leaderboards (SignalR)
-- Competition Engine Integration
-- Docker Support
-- Unit & Integration Testing
+The frontend is included for demonstration purposes and to showcase the backend API. It was built with the assistance of AI tools, while the backend architecture, business logic, API design, database implementation, and all core functionality were designed and implemented by me.
 
 ---
+
 
 # Getting Started
 
