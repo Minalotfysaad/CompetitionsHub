@@ -32,11 +32,6 @@ CompetitionsHub is designed to support competitions consisting of multiple compe
 
 ---
 
-## Contestant Competition
-
-![Contestant Competition](docs/screenshots/contestant-page.png)
-
----
 
 ## Manual Grading
 
@@ -233,17 +228,26 @@ Administrators can retrieve:
 The project follows a layered architecture to keep business logic separated from infrastructure.
 
 ```
-Presentation Layer
+                React Frontend
+                       │
+                       ▼
+            ASP.NET Core Web API
+                       │
+        ┌──────────────┴──────────────┐
+        ▼                             ▼
+   Controllers                   Authentication
+        │                             │
+        ▼                             ▼
+     Services  ─────────────► ASP.NET Identity
         │
-Controllers
+        ▼
+ Repository / Unit Of Work
         │
-Services
+        ▼
+   Entity Framework Core
         │
-Repositories
-        │
-Entity Framework Core
-        │
-SQL Server
+        ▼
+      SQL Server
 ```
 
 ### Design Patterns
