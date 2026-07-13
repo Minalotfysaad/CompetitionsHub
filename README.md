@@ -347,36 +347,102 @@ Contains Paragraph Questions?
 
 # Getting Started
 
+## Prerequisites
+
+Before running the project, make sure you have installed:
+
+- .NET 8 SDK (or your project's target .NET version)
+- SQL Server
+- Node.js (LTS version)
+- npm
+
+---
+
 ## Clone the repository
 
 ```bash
 git clone https://github.com/Minalotfysaad/CompetitionsHub.git
+cd CompetitionsHub
 ```
 
-## Restore packages
+---
+
+## Backend Setup
+
+### Restore NuGet packages
 
 ```bash
 dotnet restore
 ```
 
-## Apply migrations
+### Update the database
 
 ```bash
 dotnet ef database update
 ```
 
-## Run the project
+### Run the backend
 
 ```bash
 dotnet run
 ```
 
-Swagger will be available at:
+The API will be available at:
 
 ```
-https://localhost:{port}/swagger
+https://localhost:{backend-port}
 ```
 
+Swagger UI:
+
+```
+https://localhost:{backend-port}/swagger
+```
+
+---
+
+## Frontend Setup
+
+Open a new terminal and navigate to the frontend folder:
+
+```bash
+cd Frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+The frontend will be available at:
+
+```
+http://localhost:5173
+```
+
+---
+
+## Running the Application
+
+Run **both** the backend and frontend simultaneously.
+
+- Backend: ASP.NET Core Web API
+- Frontend: React (Vite)
+
+Once both are running, open the frontend in your browser:
+
+```
+http://localhost:5173
+```
+
+The frontend will communicate with the backend API running locally.
 ---
 
 # Author
